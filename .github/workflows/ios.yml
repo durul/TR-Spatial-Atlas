@@ -1,4 +1,4 @@
-name: iOS starter workflow
+name: visionOS starter workflow
 
 on:
   push:
@@ -8,37 +8,92 @@ on:
 
 jobs:
   build:
-    name: Build and Test default scheme using any available iPhone simulator
+    name: Build and Test default scheme on Apple Vision Pro simulator
     runs-on: macos-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Set Default Scheme
+
+      - name: Select Default Scheme
+        shell: bash
         run: |
-          scheme_list=$(xcodebuild -list -json | tr -d "\n")
-          default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
-          echo $default | cat >default
-          echo Using default scheme: $default
-      - name: Build
+          # Schemes > first scheme as default (more reliable than targets for multi-platform workspaces)
+          scheme_list=$(xcodebuild -list -json 2>/dev/null | tr -d "\n")
+          default=$(echo "$scheme_list" | ruby -e "require 'json'; j=JSON.parse(STDIN.gets); s=(j['project']||{})['schemes']||(j['workspace']||{})['schemes']; puts (s && s.first)||''")
+          if [ -z "$default" ]; then
+            echo "No Xcode scheme found. Ensure a shared scheme exists (Manage Schemes → Shared)." >&2
+            exit 1
+          fi
+          echo "$default" > .xcode_default_scheme
+          echo "Using default scheme: $default"
+
+      - name: Resolve file to build (workspace/project)
+        id: xcodefile
+        shell: bash
+        run: |
+          if ls -1 | grep -iE '\.xcworkspace$' >/dev/null 2>&1; then
+            echo "type=workspace" >> $GITHUB_OUTPUT
+            echo "file=$(ls -1 | grep -iE '\.xcworkspace$' | head -1 | xargs)" >> $GITHUB_OUTPUT
+          else
+            echo "type=project" >> $GITHUB_OUTPUT
+            echo "file=$(ls -1 | grep -iE '\.xcodeproj$' | head -1 | xargs)" >> $GITHUB_OUTPUT
+          fi
+          echo "Will build ${{ steps.xcodefile.outputs.type }}: ${{ steps.xcodefile.outputs.file }}"
+
+      - name: Pick Apple Vision Pro simulator device
+        id: device
+        shell: bash
+        run: |
+          # xcrun xctrace prints devices to stderr
+          all_devices=$(xcrun xctrace list devices 2>&1)
+          # Prefer "Apple Vision Pro" simulator; fall back to first visionOS simulator
+          name=$(echo "$all_devices" | grep -Eo '^ *Apple Vision Pro.*\(simulator\)$' | head -1 | sed -E 's/ *\((simulator)\)$//' | awk '{$1=$1;print}')
+          if [ -z "$name" ]; then
+            # any visionOS simulator line, strip trailing " (simulator)"
+            name=$(echo "$all_devices" | grep -E 'visionOS .*\(simulator\)$' | head -1 | sed -E 's/ *\((simulator)\)$//' | awk '{$1=$1;print}')
+          fi
+          if [ -z "$name" ]; then
+            echo "No visionOS Simulator found. Install visionOS Simulator via Xcode → Settings → Platforms." >&2
+            exit 1
+          fi
+          echo "device=$name" >> $GITHUB_OUTPUT
+          echo "Selected simulator: $name"
+
+      - name: Build (visionOS)
         env:
-          scheme: ${{ 'default' }}
-          platform: ${{ 'iOS Simulator' }}
+          SCHEME: ${{ 'default' }}
+          PLATFORM: ${{ 'visionOS Simulator' }}
+        shell: bash
         run: |
-          # xcrun xctrace returns via stderr, not the expected stdout (see https://developer.apple.com/forums/thread/663959)
-          device=`xcrun xctrace list devices 2>&1 | grep -oE 'iPhone.*?[^\(]+' | head -1 | awk '{$1=$1;print}' | sed -e "s/ Simulator$//"`
-          if [ $scheme = default ]; then scheme=$(cat default); fi
-          if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
-          file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
-          xcodebuild build-for-testing -scheme "$scheme" -"$filetype_parameter" "$file_to_build" -destination "platform=$platform,name=$device"
-      - name: Test
+          if [ "$SCHEME" = "default" ]; then SCHEME=$(cat .xcode_default_scheme); fi
+          FILETYPE="${{ steps.xcodefile.outputs.type }}"
+          FILEPATH="${{ steps.xcodefile.outputs.file }}"
+          DEST="platform=$PLATFORM,name=${{ steps.device.outputs.device }}"
+          set -o pipefail
+          xcodebuild \
+            -scheme "$SCHEME" \
+            -"$FILETYPE" "$FILEPATH" \
+            -destination "$DEST" \
+            -configuration Debug \
+            -derivedDataPath build \
+            build-for-testing | xcpretty
+
+      - name: Test (visionOS)
         env:
-          scheme: ${{ 'default' }}
-          platform: ${{ 'iOS Simulator' }}
+          SCHEME: ${{ 'default' }}
+          PLATFORM: ${{ 'visionOS Simulator' }}
+        shell: bash
         run: |
-          # xcrun xctrace returns via stderr, not the expected stdout (see https://developer.apple.com/forums/thread/663959)
-          device=`xcrun xctrace list devices 2>&1 | grep -oE 'iPhone.*?[^\(]+' | head -1 | awk '{$1=$1;print}' | sed -e "s/ Simulator$//"`
-          if [ $scheme = default ]; then scheme=$(cat default); fi
-          if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
-          file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
-          xcodebuild test-without-building -scheme "$scheme" -"$filetype_parameter" "$file_to_build" -destination "platform=$platform,name=$device"
+          if [ "$SCHEME" = "default" ]; then SCHEME=$(cat .xcode_default_scheme); fi
+          FILETYPE="${{ steps.xcodefile.outputs.type }}"
+          FILEPATH="${{ steps.xcodefile.outputs.file }}"
+          DEST="platform=$PLATFORM,name=${{ steps.device.outputs.device }}"
+          set -o pipefail
+          xcodebuild \
+            -scheme "$SCHEME" \
+            -"$FILETYPE" "$FILEPATH" \
+            -destination "$DEST" \
+            -configuration Debug \
+            -derivedDataPath build \
+            test-without-building | xcpretty
