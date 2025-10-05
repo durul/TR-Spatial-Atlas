@@ -4,6 +4,10 @@ This project is a VisionOS application that visualizes the boundaries of Turkeyâ
 It serves as a strong example of **GeoJSON polygon data visualization** using **RealityKit**  
 and showcases the power of **Spatial Computing** on VisionOS.
 
+<img width="3840" height="2160" alt="Simulator Screenshot - Apple Vision Pro - 2025-10-05 at 11 32 26" src="https://github.com/user-attachments/assets/38a51bc5-4124-4e28-aeb3-756f9018931b" />
+
+
+
 ## âœ¨ Features
 
 - **Visualization of 81 Provinces**: Renders the boundaries of all provinces in Turkey as colorful 3D polygons.
