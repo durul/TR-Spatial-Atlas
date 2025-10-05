@@ -14,12 +14,12 @@ struct ContentView: View {
 
     var body: some View {
         VStack {
-            Text("🇹🇷 Türkiye Haritası")
+            Text("🇹🇷 Türkiye Map")
                 .font(.title)
                 .fontWeight(.bold)
                 .padding()
 
-            Text("Türkiye'nin il sınırlarının 3D görselleştirmesi")
+            Text("3D visualization of Türkiye's provincial borders")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
                 .padding(.bottom)

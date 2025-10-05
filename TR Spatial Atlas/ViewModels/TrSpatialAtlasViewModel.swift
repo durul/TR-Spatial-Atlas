@@ -295,7 +295,7 @@ class TrSpatialAtlasViewModel {
         var allVertices: [SIMD3<Float>] = []
         var allCounts: [UInt8] = []
         var allIndices: [UInt32] = []
-        var currentIndexOffset: UInt32 = 0
+        let currentIndexOffset: UInt32 = 0
         
         // Sadece DIŞ SINIRI al (ilk ring), iç delikleri atla
         guard let outerRing = coordinates.first else { return }
