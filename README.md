@@ -250,37 +250,7 @@ let significantPolygons = Array(polygonData.prefix(keepCount))
 2. **📊 Data Layers**: Population, income, tourism data overlay
 3. **🎨 Animation**: Dynamic elevation of provinces
 4. **📱 Gesture Support**: Pinch-to-zoom, rotate
-5. **🔊 Audio**: Voice information for each province
-6. **🌐 API Integration**: Real-time data update
 
-## 🛠️ Build and Run
-
-```bash
-# In the project directory
-cd "/path/to/Day11_Turkiye"
-
-# Build for VisionOS Simulator
-xcodebuild -scheme Day11 -destination "platform=visionOS Simulator,name=Apple Vision Pro" build
-
-# Run in Xcode
-# Press Run in Xcode or open in Simulator
-```
-
-## ✅ Tested
-
-- ✅ VisionOS 26 Simulator
-- ✅ Apple Vision Pro Simulator
-- ✅ 81 provinces successfully rendered
-- ✅ Winding order issue resolved
-- ✅ MultiPolygon support enabled
-- ✅ Island filtering working
-
-## 🎖️ Achievements
-
-- 🏆 **Fixed a difficult rendering bug** (Winding Order)
-- 🏆 **Rendered all 81 provinces** (325+ polygons)
-- 🏆 **Optimized performance** (0.30 second load)
-- 🏆 **Gained experience with spatial computing**
 
 ---
 
