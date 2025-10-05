@@ -51,7 +51,7 @@ vertices.reverse()  // Counter-clockwise → Suitable for RealityKit! ✅
 ## 🏗️ Technical Architecture
 
 ### **Main Components:**
-- **VisionOS 2.0** - Apple Vision Pro operating system.
+- **VisionOS 26** - Apple Vision Pro operating system.
 - **SwiftUI** - User interface.
 - **RealityKit** - 3D graphics and polygon rendering.
 - **GeoJSON** - Turkey map data (81 provinces + islands).
@@ -268,7 +268,7 @@ xcodebuild -scheme Day11 -destination "platform=visionOS Simulator,name=Apple Vi
 
 ## ✅ Tested
 
-- ✅ VisionOS 2.0 Simulator
+- ✅ VisionOS 26 Simulator
 - ✅ Apple Vision Pro Simulator
 - ✅ 81 provinces successfully rendered
 - ✅ Winding order issue resolved
