@@ -20,8 +20,8 @@ class TrSpatialAtlasViewModel {
         let xRotation = simd_quatf(angle: -.pi / 2, axis: SIMD3<Float>(1, 0, 0))
         contentEntity.transform.rotation = xRotation
         
-        // Optimal boyut
-        contentEntity.scale = [1.0, 1.0, 1.0]
+        // Haritayı BÜYÜT - daha iyi görmek için
+        contentEntity.scale = [1.5, 1.5, 1.5]
         
         return contentEntity
     }
@@ -41,9 +41,9 @@ class TrSpatialAtlasViewModel {
     private func loadGeoJSONData(fileName: String) {
         loadingProgress = "\(fileName) dosyası işleniyor..."
         
-        guard let fileUrl = Bundle.main.url(forResource: fileName, withExtension: "geojson") else { 
+        guard let fileUrl = Bundle.main.url(forResource: fileName, withExtension: "geojson") else {
             print("GeoJSON file not found: \(fileName)")
-            return 
+            return
         }
 
         do {
@@ -78,7 +78,13 @@ class TrSpatialAtlasViewModel {
         
         var processedCount = 0
         var skippedCount = 0
-        
+//
+//        // DEBUG: Sadece KONYA'yı göster
+//        let testFeatures = features.filter { $0.properties?.name == "Konya" }
+//        print("🔍 DEBUG: Testing with \(testFeatures.count) feature(s)")
+//
+//        for (index, feature) in testFeatures.enumerated() {
+//
         for (index, feature) in features.enumerated() {
             switch feature.geometry.type {
             case "Point":
@@ -115,7 +121,7 @@ class TrSpatialAtlasViewModel {
         let latitude = Float(coordinates[1])
         
         // Koordinatları 3D uzayına dönüştür
-        let x = (longitude - constants.center.x) * constants.scaleFactor  
+        let x = (longitude - constants.center.x) * constants.scaleFactor
         let z = (latitude - constants.center.y) * constants.scaleFactor
         let y: Float = 0.01 // Nokta için yükseklik
         
@@ -142,9 +148,9 @@ class TrSpatialAtlasViewModel {
             let latitude = Float(point[1])
             
             // Koordinatları 3D uzayına dönüştür
-            let x = (longitude - constants.center.x) * constants.scaleFactor  
+            let x = (longitude - constants.center.x) * constants.scaleFactor
             let z = (latitude - constants.center.y) * constants.scaleFactor
-            let y: Float = 0.002  // İl sınırları için biraz daha yüksek
+            let y: Float = 0.002 // İl sınırları için biraz daha yüksek
             
             vertices.append(SIMD3<Float>(x, y, z))
         }
@@ -162,8 +168,8 @@ class TrSpatialAtlasViewModel {
             
             // Cylinder oluştur (İL SINIRLARI İÇİN DAHA KALIN VE GÖRÜNÜR)
             let cylinder = MeshResource.generateCylinder(height: distance, radius: 0.005)
-            var material = UnlitMaterial(color: .systemBlue)  // Mavi renk - daha belirgin
-            material.blending = .transparent(opacity: 1.0)    // Tam opak
+            var material = UnlitMaterial(color: .systemBlue) // Mavi renk - daha belirgin
+            material.blending = .transparent(opacity: 1.0) // Tam opak
             
             let cylinderEntity = ModelEntity(mesh: cylinder, materials: [material])
             cylinderEntity.position = center
@@ -351,7 +357,7 @@ class TrSpatialAtlasViewModel {
         guard vertices.count >= 3 else { return }
         
         // Vertex sayısını 255'in altına düşürmek için sadeleştirme faktörü hesapla
-        let targetVertexCount = 200  // Güvenli bir hedef (255'in altında)
+        let targetVertexCount = 200 // Güvenli bir hedef (255'in altında)
         let step = Int(ceil(Double(vertices.count) / Double(targetVertexCount)))
         
         var simplifiedVertices: [SIMD3<Float>] = []
@@ -362,11 +368,11 @@ class TrSpatialAtlasViewModel {
         }
         
         // Poligonu kapatmak için son vertex'i ekle
-        if simplifiedVertices.count > 0 && simplifiedVertices.first != vertices.first {
+        if simplifiedVertices.count > 0, simplifiedVertices.first != vertices.first {
             simplifiedVertices.append(vertices.first!)
         }
         
-        guard simplifiedVertices.count >= 3 && simplifiedVertices.count <= 255 else {
+        guard simplifiedVertices.count >= 3, simplifiedVertices.count <= 255 else {
             print("  Failed to simplify polygon: \(simplifiedVertices.count) vertices (step: \(step))")
             return
         }
