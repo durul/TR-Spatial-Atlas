@@ -59,16 +59,74 @@ vertices.reverse()  // Counter-clockwise → Suitable for RealityKit! ✅
 
 ### **Project Structure:**
 ```
-Day11/
-├── Day11App.swift                 # Main application
-├── Models/
-│   ├── AppModel.swift            # Immersive space management
-│   └── ViewModel.swift           # GeoJSON processing and 3D rendering
-├── Views/
-│   ├── ContentView.swift         # Main UI
-│   ├── ImmersiveView.swift       # 3D scene
-│   └── ToggleImmersiveSpaceButton.swift
-└── Turkey.geojson                # Turkey map (81 provinces)
+├── Packages
+│   └── RealityKitContent
+│       ├── Package.realitycomposerpro
+│       │   ├── ProjectData
+│       │   │   └── main.json
+│       │   └── WorkspaceData
+│       │       ├── SceneMetadataList.json
+│       │       └── Settings.rcprojectdata
+│       ├── Package.swift
+│       ├── README.md
+│       └── Sources
+│           └── RealityKitContent
+│               ├── RealityKitContent.rkassets
+│               │   ├── Ground
+│               │   │   ├── DefaultAttenuationMap.exr
+│               │   │   └── Ground.usda
+│               │   ├── Immersive.usda
+│               │   └── SkyDome.usdz
+│               └── RealityKitContent.swift
+├── README.md
+├── TR Spatial Atlas
+│   ├── App
+│   │   └── TR_Spatial_AtlasApp.swift
+│   ├── Assets.xcassets
+│   │   ├── AccentColor.colorset
+│   │   │   └── Contents.json
+│   │   ├── AppIcon.solidimagestack
+│   │   │   ├── Back.solidimagestacklayer
+│   │   │   │   ├── Content.imageset
+│   │   │   │   │   └── Contents.json
+│   │   │   │   └── Contents.json
+│   │   │   ├── Contents.json
+│   │   │   ├── Front.solidimagestacklayer
+│   │   │   │   ├── Content.imageset
+│   │   │   │   │   └── Contents.json
+│   │   │   │   └── Contents.json
+│   │   │   └── Middle.solidimagestacklayer
+│   │   │       ├── Content.imageset
+│   │   │       │   └── Contents.json
+│   │   │       └── Contents.json
+│   │   └── Contents.json
+│   ├── Info.plist
+│   ├── Model
+│   │   ├── AppModel.swift
+│   │   └── GeoJSONDataDTO.swift
+│   ├── Turkey.geojson
+│   ├── ViewModels
+│   │   └── TrSpatialAtlasViewModel.swift
+│   └── Views
+│       ├── ContentView.swift
+│       ├── ImmersiveView.swift
+│       └── ToggleImmersiveSpaceButton.swift
+├── TR Spatial Atlas.xcodeproj
+│   ├── project.pbxproj
+│   ├── project.xcworkspace
+│   │   ├── contents.xcworkspacedata
+│   │   ├── xcshareddata
+│   │   │   └── swiftpm
+│   │   │       └── configuration
+│   │   └── xcuserdata
+│   │       └── durulmac2013.xcuserdatad
+│   │           └── UserInterfaceState.xcuserstate
+│   └── xcuserdata
+│       └── durulmac2013.xcuserdatad
+│           └── xcschemes
+│               └── xcschememanagement.plist
+└── TR Spatial AtlasTests
+    └── TR_Spatial_AtlasTests.swift
 ```
 
 ## 🎮 Usage
