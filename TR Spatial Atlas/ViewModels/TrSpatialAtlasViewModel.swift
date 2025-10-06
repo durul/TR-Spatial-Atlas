@@ -11,10 +11,36 @@ class TrSpatialAtlasViewModel {
     // Loading state
     var isLoading = false
     var loadingProgress = ""
+    
+    // Color palette for 81 provinces
+    private let provinceColors: [UIColor] = {
+        var colors: [UIColor] = []
+        
+        // 81 farklı renk üretmek için HSB (Hue, Saturation, Brightness) kullan
+        for i in 0..<81 {
+            let hue = CGFloat(i) / 81.0 // 0.0 - 1.0 arasında renk spektrumu
+            let saturation: CGFloat = 0.7 + (CGFloat(i % 3) * 0.1) // 0.7, 0.8, 0.9 arası varyasyon
+            let brightness: CGFloat = 0.6 + (CGFloat(i % 4) * 0.1) // 0.6 - 0.9 arası varyasyon
+            
+            let color = UIColor(hue: hue, saturation: saturation, brightness: brightness, alpha: 1.0)
+            colors.append(color)
+        }
+        
+        return colors
+    }()
 
     func setupContentEntity() -> Entity {
         // Haritayı göz hizasında ve optimal mesafede konumlandır
-        contentEntity.position = [0, 1.5, -2.5]
+        contentEntity.position = [0, 1.5, -1]
+//
+//        // Nesneyi yere koy (y=0)
+//        entity.position = [0, 0, -1]
+//
+//        // Nesneyi sağa kaydır (x=0.5)
+//        entity.position = [0.5, 1.5, -2.5]
+//
+//        // Nesneyi yakına getir (z=-1)
+//        entity.position = [0, 1.5, -1]
         
         // Haritayı düz yatır (X ekseni etrafında 90° - yere paralel yap)
         let xRotation = simd_quatf(angle: -.pi / 2, axis: SIMD3<Float>(1, 0, 0))
@@ -194,14 +220,8 @@ class TrSpatialAtlasViewModel {
         let provinceName = feature.properties?.name ?? "Unknown"
         print("Creating MultiPolygon for \(provinceName) with \(multiPolygonCoordinates.count) polygons")
         
-        // RENK PALETİ
-        let colors: [UIColor] = [
-            .systemTeal, .systemOrange, .systemPurple, .systemYellow, .systemPink,
-            .systemIndigo, .systemBrown, .systemCyan, .systemMint, .systemRed
-        ]
-        
-        // Her İL için TEK BİR RENK
-        let color = colors[index % colors.count]
+        // Different colors for 81 provinces
+        let color = provinceColors[index % provinceColors.count]
         
         // Her polygon'u AYRI bir entity olarak ekle - küçük adaları filtrele
         let provinceGroup = Entity()
@@ -284,12 +304,8 @@ class TrSpatialAtlasViewModel {
         let provinceName = feature.properties?.name ?? "Unknown"
         print("Creating Polygon for \(provinceName)")
         
-        let polygonColors: [UIColor] = [
-            .systemTeal, .systemOrange, .systemPurple, .systemYellow, .systemPink,
-            .systemIndigo, .systemBrown, .systemCyan, .systemMint, .systemRed
-        ]
-        
-        let color = polygonColors[index % polygonColors.count]
+        // Different colors for 81 provinces
+        let color = provinceColors[index % provinceColors.count]
         
         // Tüm ring'leri birleştir - tek mesh yap
         var allVertices: [SIMD3<Float>] = []
