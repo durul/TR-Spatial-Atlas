@@ -4,6 +4,10 @@ This project is a VisionOS application that visualizes the boundaries of Turkey�
 It serves as a strong example of **GeoJSON polygon data visualization** using **RealityKit**  
 and showcases the power of **Spatial Computing** on VisionOS.
 
+<img width="3840" height="2160" alt="Simulator Screenshot - Apple Vision Pro - 2025-10-05 at 11 32 26" src="https://github.com/user-attachments/assets/38a51bc5-4124-4e28-aeb3-756f9018931b" />
+
+
+
 ## ✨ Features
 
 - **Visualization of 81 Provinces**: Renders the boundaries of all provinces in Turkey as colorful 3D polygons.
@@ -250,37 +254,7 @@ let significantPolygons = Array(polygonData.prefix(keepCount))
 2. **📊 Data Layers**: Population, income, tourism data overlay
 3. **🎨 Animation**: Dynamic elevation of provinces
 4. **📱 Gesture Support**: Pinch-to-zoom, rotate
-5. **🔊 Audio**: Voice information for each province
-6. **🌐 API Integration**: Real-time data update
 
-## 🛠️ Build and Run
-
-```bash
-# In the project directory
-cd "/path/to/Day11_Turkiye"
-
-# Build for VisionOS Simulator
-xcodebuild -scheme Day11 -destination "platform=visionOS Simulator,name=Apple Vision Pro" build
-
-# Run in Xcode
-# Press Run in Xcode or open in Simulator
-```
-
-## ✅ Tested
-
-- ✅ VisionOS 26 Simulator
-- ✅ Apple Vision Pro Simulator
-- ✅ 81 provinces successfully rendered
-- ✅ Winding order issue resolved
-- ✅ MultiPolygon support enabled
-- ✅ Island filtering working
-
-## 🎖️ Achievements
-
-- 🏆 **Fixed a difficult rendering bug** (Winding Order)
-- 🏆 **Rendered all 81 provinces** (325+ polygons)
-- 🏆 **Optimized performance** (0.30 second load)
-- 🏆 **Gained experience with spatial computing**
 
 ---
 
