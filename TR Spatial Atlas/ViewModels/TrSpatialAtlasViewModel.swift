@@ -8,6 +8,9 @@ class TrSpatialAtlasViewModel {
     private let constants = Constants()
     private let decoder = JSONDecoder()
     
+    // RealityKit 26: unified manipulation (move/rotate/scale)
+    private var manipulation = ManipulationComponent()
+    
     // Loading state
     var isLoading = false
     var loadingProgress = ""
@@ -16,11 +19,11 @@ class TrSpatialAtlasViewModel {
     private let provinceColors: [UIColor] = {
         var colors: [UIColor] = []
         
-        // 81 farklı renk üretmek için HSB (Hue, Saturation, Brightness) kullan
+        // Use HSB (Hue, Saturation, Brightness) to generate 81 different colors
         for i in 0..<81 {
-            let hue = CGFloat(i) / 81.0 // 0.0 - 1.0 arasında renk spektrumu
-            let saturation: CGFloat = 0.7 + (CGFloat(i % 3) * 0.1) // 0.7, 0.8, 0.9 arası varyasyon
-            let brightness: CGFloat = 0.6 + (CGFloat(i % 4) * 0.1) // 0.6 - 0.9 arası varyasyon
+            let hue = CGFloat(i) / 81.0 // Color spectrum between 0.0 - 1.0
+            let saturation: CGFloat = 0.7 + (CGFloat(i % 3) * 0.1) // Variation between 0.7, 0.8, 0.9
+            let brightness: CGFloat = 0.6 + (CGFloat(i % 4) * 0.1) // Variation between 0.6 - 0.9
             
             let color = UIColor(hue: hue, saturation: saturation, brightness: brightness, alpha: 1.0)
             colors.append(color)
@@ -30,42 +33,62 @@ class TrSpatialAtlasViewModel {
     }()
 
     func setupContentEntity() -> Entity {
-        // Haritayı göz hizasında ve optimal mesafede konumlandır
+        // Position the map at eye level and optimal distance
         contentEntity.position = [0, 1.5, -1]
 //
-//        // Nesneyi yere koy (y=0)
+//        // Place the object on the ground (y=0)
 //        entity.position = [0, 0, -1]
 //
-//        // Nesneyi sağa kaydır (x=0.5)
+//        // Move the object to the right (x=0.5)
 //        entity.position = [0.5, 1.5, -2.5]
 //
-//        // Nesneyi yakına getir (z=-1)
+//        // Bring the object closer (z=-1)
 //        entity.position = [0, 1.5, -1]
         
-        // Haritayı düz yatır (X ekseni etrafında 90° - yere paralel yap)
+        // Lay the map flat (rotate 90° around X axis - parallel to ground)
         let xRotation = simd_quatf(angle: -.pi / 2, axis: SIMD3<Float>(1, 0, 0))
         contentEntity.transform.rotation = xRotation
         
-        // Haritayı BÜYÜT - daha iyi görmek için
-        contentEntity.scale = [1.5, 1.5, 1.5]
+        // SCALE UP the map - for better visibility
+        contentEntity.scale = [1.5, 0.5, 1.5]
+
+        // Enable hand manipulation on the whole map surface
+        // 1) Add InputTarget + Collision via helper (approximate flat map bounds)
+        ManipulationComponent.configureEntity(
+            contentEntity,
+            collisionShapes: [
+                .generateBox(width: 3.0, height: 0.05, depth: 3.0)
+            ]
+        )
+
+        // 2) Customize behavior (tweak as needed for your UX)
+        manipulation.releaseBehavior = .stay // keep where user leaves it
+        manipulation.dynamics.translationBehavior = .none
+        manipulation.dynamics.primaryRotationBehavior = .none
+        manipulation.dynamics.secondaryRotationBehavior = .none
+        manipulation.dynamics.scalingBehavior = .unconstrained
+        manipulation.dynamics.inertia = .high
+
+        // 3) Attach the component
+        contentEntity.components.set(manipulation)
         
         return contentEntity
     }
 
     func makePolygon() {
         isLoading = true
-        loadingProgress = "GeoJSON verisi yükleniyor..."
+        loadingProgress = "Loading GeoJSON data..."
         
         constants.mapDataFiles.forEach { fileName in
             loadGeoJSONData(fileName: fileName)
         }
         
         isLoading = false
-        loadingProgress = "Tamamlandı ✅"
+        loadingProgress = "Complete ✅"
     }
 
     private func loadGeoJSONData(fileName: String) {
-        loadingProgress = "\(fileName) dosyası işleniyor..."
+        loadingProgress = "Processing \(fileName) file..."
         
         guard let fileUrl = Bundle.main.url(forResource: fileName, withExtension: "geojson") else {
             print("GeoJSON file not found: \(fileName)")
@@ -80,21 +103,21 @@ class TrSpatialAtlasViewModel {
             print("✅ GeoJSON decoded successfully!")
             print("📊 Total features: \(geoJSON.features.count)")
             
-            // İlk birkaç il ismini yazdır
+            // Print first few province names
             for (index, feature) in geoJSON.features.prefix(5).enumerated() {
                 if let name = feature.properties?.name {
                     print("   [\(index)] \(name)")
                 }
             }
             
-            loadingProgress = "3D modeller oluşturuluyor..."
+            loadingProgress = "Creating 3D models..."
             processFeatures(geoJSON.features)
         } catch {
             print("❌ Error loading GeoJSON: \(error)")
             if let decodingError = error as? DecodingError {
                 print("   Decoding error details: \(decodingError)")
             }
-            loadingProgress = "Hata: \(error.localizedDescription)"
+            loadingProgress = "Error: \(error.localizedDescription)"
         }
     }
     
@@ -146,12 +169,12 @@ class TrSpatialAtlasViewModel {
         let longitude = Float(coordinates[0])
         let latitude = Float(coordinates[1])
         
-        // Koordinatları 3D uzayına dönüştür
+        // Convert coordinates to 3D space
         let x = (longitude - constants.center.x) * constants.scaleFactor
         let z = (latitude - constants.center.y) * constants.scaleFactor
-        let y: Float = 0.01 // Nokta için yükseklik
+        let y: Float = 0.01 // Height for point
         
-        // Küre oluştur (daha büyük boyut)
+        // Create sphere (larger size)
         let sphere = MeshResource.generateSphere(radius: 0.08)
         var material = UnlitMaterial(color: .red)
         material.blending = .transparent(opacity: 0.9)
@@ -173,17 +196,17 @@ class TrSpatialAtlasViewModel {
             let longitude = Float(point[0])
             let latitude = Float(point[1])
             
-            // Koordinatları 3D uzayına dönüştür
+            // Convert coordinates to 3D space
             let x = (longitude - constants.center.x) * constants.scaleFactor
             let z = (latitude - constants.center.y) * constants.scaleFactor
-            let y: Float = 0.002 // İl sınırları için biraz daha yüksek
+            let y: Float = 0.002 // Slightly higher for province borders
             
             vertices.append(SIMD3<Float>(x, y, z))
         }
         
         guard vertices.count >= 2 else { return }
         
-        // LineString için cylinder-based approach - İL SINIRLARI İÇİN DAHA KALIN
+        // Cylinder-based approach for LineString - THICKER FOR PROVINCE BORDERS
         for i in 0..<(vertices.count - 1) {
             let start = vertices[i]
             let end = vertices[i + 1]
@@ -192,10 +215,10 @@ class TrSpatialAtlasViewModel {
             let distance = length(direction)
             let center = (start + end) / 2
             
-            // Cylinder oluştur (İL SINIRLARI İÇİN DAHA KALIN VE GÖRÜNÜR)
+            // Create cylinder (THICKER AND MORE VISIBLE FOR PROVINCE BORDERS)
             let cylinder = MeshResource.generateCylinder(height: distance, radius: 0.005)
-            var material = UnlitMaterial(color: .systemBlue) // Mavi renk - daha belirgin
-            material.blending = .transparent(opacity: 1.0) // Tam opak
+            var material = UnlitMaterial(color: .systemBlue) // Blue color - more prominent
+            material.blending = .transparent(opacity: 1.0) // Fully opaque
             
             let cylinderEntity = ModelEntity(mesh: cylinder, materials: [material])
             cylinderEntity.position = center
@@ -223,11 +246,11 @@ class TrSpatialAtlasViewModel {
         // Different colors for 81 provinces
         let color = provinceColors[index % provinceColors.count]
         
-        // Her polygon'u AYRI bir entity olarak ekle - küçük adaları filtrele
+        // Add each polygon as SEPARATE entity - filter out small islands
         let provinceGroup = Entity()
         provinceGroup.name = provinceName
         
-        // Polygon'ları boyutlarına göre sırala - en büyükleri al
+        // Sort polygons by size - take the largest ones
         var polygonData: [(vertices: [SIMD3<Float>], area: Float)] = []
         
         for polygonCoordinates in multiPolygonCoordinates {
@@ -254,10 +277,10 @@ class TrSpatialAtlasViewModel {
             polygonData.append((vertices: vertices, area: area))
         }
         
-        // Büyükten küçüğe sırala
+        // Sort from largest to smallest
         polygonData.sort { $0.area > $1.area }
         
-        // Sadece önemli polygon'ları al (küçük adacıkları filtrele)
+        // Take only significant polygons (filter out small islets)
         let keepCount = max(5, Int(Float(polygonData.count) * 0.5))
         let significantPolygons = Array(polygonData.prefix(keepCount))
         
@@ -284,7 +307,7 @@ class TrSpatialAtlasViewModel {
             do {
                 let polygonMesh = try MeshResource.generate(from: [meshDescriptor])
                 var material = UnlitMaterial(color: color)
-                material.blending = .transparent(opacity: 0.95) // Daha opak
+                material.blending = .transparent(opacity: 0.95) // More opaque
                 
                 let polygonEntity = ModelEntity(mesh: polygonMesh, materials: [material])
                 provinceGroup.addChild(polygonEntity)
@@ -307,13 +330,13 @@ class TrSpatialAtlasViewModel {
         // Different colors for 81 provinces
         let color = provinceColors[index % provinceColors.count]
         
-        // Tüm ring'leri birleştir - tek mesh yap
+        // Combine all rings - create single mesh
         var allVertices: [SIMD3<Float>] = []
         var allCounts: [UInt8] = []
         var allIndices: [UInt32] = []
         let currentIndexOffset: UInt32 = 0
         
-        // Sadece DIŞ SINIRI al (ilk ring), iç delikleri atla
+        // Take only OUTER BOUNDARY (first ring), skip inner holes
         guard let outerRing = coordinates.first else { return }
         
         var vertices: [SIMD3<Float>] = []
@@ -335,7 +358,7 @@ class TrSpatialAtlasViewModel {
             return
         }
         
-        // Büyük poligonları parçalara böl
+        // Split large polygons into parts
         if vertices.count > 255 {
             print("Subdividing polygon for \(provinceName) with \(vertices.count) vertices")
             createSubdividedPolygon(vertices: vertices, color: color)
@@ -348,7 +371,7 @@ class TrSpatialAtlasViewModel {
         }
         allVertices.append(contentsOf: vertices)
         
-        // Tek mesh oluştur
+        // Create single mesh
         var meshDescriptor = MeshDescriptor()
         meshDescriptor.positions = .init(allVertices)
         meshDescriptor.primitives = .polygons(allCounts, allIndices)
@@ -356,7 +379,7 @@ class TrSpatialAtlasViewModel {
         do {
             let provinceMesh = try MeshResource.generate(from: [meshDescriptor])
             var material = UnlitMaterial(color: color)
-            material.blending = .transparent(opacity: 0.95) // Daha opak
+            material.blending = .transparent(opacity: 0.95) // More opaque
             
             let provinceEntity = ModelEntity(mesh: provinceMesh, materials: [material])
             provinceEntity.name = provinceName
@@ -368,22 +391,22 @@ class TrSpatialAtlasViewModel {
         }
     }
     
-    // Büyük poligonları sadeleştirerek vertex sayısını azalt
+    // Simplify large polygons to reduce vertex count
     private func createSubdividedPolygon(vertices: [SIMD3<Float>], color: UIColor) {
         guard vertices.count >= 3 else { return }
         
-        // Vertex sayısını 255'in altına düşürmek için sadeleştirme faktörü hesapla
-        let targetVertexCount = 200 // Güvenli bir hedef (255'in altında)
+        // Calculate simplification factor to bring vertex count below 255
+        let targetVertexCount = 200 // Safe target (below 255)
         let step = Int(ceil(Double(vertices.count) / Double(targetVertexCount)))
         
         var simplifiedVertices: [SIMD3<Float>] = []
         
-        // Her 'step' noktada bir al
+        // Take one point every 'step' points
         for i in stride(from: 0, to: vertices.count, by: step) {
             simplifiedVertices.append(vertices[i])
         }
         
-        // Poligonu kapatmak için son vertex'i ekle
+        // Add last vertex to close the polygon
         if simplifiedVertices.count > 0, simplifiedVertices.first != vertices.first {
             simplifiedVertices.append(vertices.first!)
         }

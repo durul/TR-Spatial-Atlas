@@ -8,18 +8,18 @@
 import Foundation
 
 public struct Constants {
-    // Türkiye koordinat merkezi (longitude, latitude) - Ankara yakını
+    // Turkey coordinate center (longitude, latitude) - near Ankara
     let center: SIMD2<Float> = [35.0, 39.0]
 
-    // Türkiye için ölçekleme faktörü - görünür boyut
-    let scaleFactor: Float = 0.05 // KÜÇÜK - görüş alanına sığsın
+    // Scaling factor for Turkey - visible size
+    let scaleFactor: Float = 0.05 // SMALL - to fit in field of view
 
     let mapDataFiles = [
         "Turkey"
     ]
 }
 
-// Yeni GeoJSON veri yapısı
+// New GeoJSON data structure
 struct GeoJSONData: Codable {
     let type: String
     let features: [GeoJSONFeature]
@@ -48,7 +48,7 @@ struct GeoJSONGeometry: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         type = try container.decode(String.self, forKey: .type)
 
-        // Geometry tipine göre coordinates'i decode et
+        // Decode coordinates based on geometry type
         switch type {
         case "Point":
             let coords = try container.decode([Double].self, forKey: .coordinates)
