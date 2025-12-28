@@ -33,8 +33,8 @@ class TrSpatialAtlasViewModel {
     }()
 
     func setupContentEntity() -> Entity {
-        // Position the map at eye level and optimal distance
-        contentEntity.position = [0, 1.5, -1]
+        // Position the map at (approx) eye level. Tune Y if it feels too high/low on device.
+        contentEntity.position = [0, 1.0, -1]
 //
 //        // Place the object on the ground (y=0)
 //        entity.position = [0, 0, -1]
