@@ -10,24 +10,13 @@
 		CA25C21F2E92BCC600A50417 /* RealityKitContent in Frameworks */ = {isa = PBXBuildFile; productRef = CA25C21E2E92BCC600A50417 /* RealityKitContent */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		CA25C2362E92BCC700A50417 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = CA25C2112E92BCC600A50417 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = CA25C2182E92BCC600A50417;
-			remoteInfo = "TR Spatial Atlas";
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
 		CA25C2192E92BCC600A50417 /* TRSpatialAtlas.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TRSpatialAtlas.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA25C21D2E92BCC600A50417 /* RealityKitContent */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = RealityKitContent; sourceTree = "<group>"; };
-		CA25C2352E92BCC700A50417 /* TRSpatialAtlasTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TRSpatialAtlasTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		CA25C23B2E92BCC700A50417 /* Exceptions for "TR Spatial Atlas" folder in "TRSpatialAtlas" target */ = {
+		CA25C23B2E92BCC700A50417 /* Exceptions for "TRSpatialAtlas" folder in "TRSpatialAtlas" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -37,17 +26,12 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		CA25C21B2E92BCC600A50417 /* TR Spatial Atlas */ = {
+		CA25C21B2E92BCC600A50417 /* TRSpatialAtlas */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				CA25C23B2E92BCC700A50417 /* Exceptions for "TR Spatial Atlas" folder in "TRSpatialAtlas" target */,
+				CA25C23B2E92BCC700A50417 /* Exceptions for "TRSpatialAtlas" folder in "TRSpatialAtlas" target */,
 			);
-			path = "TR Spatial Atlas";
-			sourceTree = "<group>";
-		};
-		CA25C2382E92BCC700A50417 /* TR Spatial AtlasTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "TR Spatial AtlasTests";
+			path = TRSpatialAtlas;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -61,22 +45,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CA25C2322E92BCC700A50417 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		CA25C2102E92BCC600A50417 = {
 			isa = PBXGroup;
 			children = (
-				CA25C21B2E92BCC600A50417 /* TR Spatial Atlas */,
+				CA25C21B2E92BCC600A50417 /* TRSpatialAtlas */,
 				CA25C21C2E92BCC600A50417 /* Packages */,
-				CA25C2382E92BCC700A50417 /* TR Spatial AtlasTests */,
 				CA25C21A2E92BCC600A50417 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -85,7 +61,6 @@
 			isa = PBXGroup;
 			children = (
 				CA25C2192E92BCC600A50417 /* TRSpatialAtlas.app */,
-				CA25C2352E92BCC700A50417 /* TRSpatialAtlasTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -114,7 +89,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				CA25C21B2E92BCC600A50417 /* TR Spatial Atlas */,
+				CA25C21B2E92BCC600A50417 /* TRSpatialAtlas */,
 			);
 			name = TRSpatialAtlas;
 			packageProductDependencies = (
@@ -123,29 +98,6 @@
 			productName = "TR Spatial Atlas";
 			productReference = CA25C2192E92BCC600A50417 /* TRSpatialAtlas.app */;
 			productType = "com.apple.product-type.application";
-		};
-		CA25C2342E92BCC700A50417 /* TRSpatialAtlasTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = CA25C2412E92BCC700A50417 /* Build configuration list for PBXNativeTarget "TRSpatialAtlasTests" */;
-			buildPhases = (
-				CA25C2312E92BCC700A50417 /* Sources */,
-				CA25C2322E92BCC700A50417 /* Frameworks */,
-				CA25C2332E92BCC700A50417 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				CA25C2372E92BCC700A50417 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				CA25C2382E92BCC700A50417 /* TR Spatial AtlasTests */,
-			);
-			name = TRSpatialAtlasTests;
-			packageProductDependencies = (
-			);
-			productName = "TR Spatial AtlasTests";
-			productReference = CA25C2352E92BCC700A50417 /* TRSpatialAtlasTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -159,10 +111,6 @@
 				TargetAttributes = {
 					CA25C2182E92BCC600A50417 = {
 						CreatedOnToolsVersion = 26.0.1;
-					};
-					CA25C2342E92BCC700A50417 = {
-						CreatedOnToolsVersion = 26.0.1;
-						TestTargetID = CA25C2182E92BCC600A50417;
 					};
 				};
 			};
@@ -181,20 +129,12 @@
 			projectRoot = "";
 			targets = (
 				CA25C2182E92BCC600A50417 /* TRSpatialAtlas */,
-				CA25C2342E92BCC700A50417 /* TRSpatialAtlasTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		CA25C2172E92BCC600A50417 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		CA25C2332E92BCC700A50417 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -211,22 +151,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CA25C2312E92BCC700A50417 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		CA25C2372E92BCC700A50417 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = CA25C2182E92BCC600A50417 /* TRSpatialAtlas */;
-			targetProxy = CA25C2362E92BCC700A50417 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		CA25C23D2E92BCC700A50417 /* Debug */ = {
@@ -412,52 +337,6 @@
 			};
 			name = Release;
 		};
-		CA25C2422E92BCC700A50417 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = MVFU2L7FRK;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.durul.TR-Spatial-AtlasTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SUPPORTED_PLATFORMS = "xros xrsimulator";
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 7;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TRSpatialAtlas.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TRSpatialAtlas";
-				XROS_DEPLOYMENT_TARGET = 26.0;
-			};
-			name = Debug;
-		};
-		CA25C2432E92BCC700A50417 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = MVFU2L7FRK;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.durul.TR-Spatial-AtlasTests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SUPPORTED_PLATFORMS = "xros xrsimulator";
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 7;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TRSpatialAtlas.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TRSpatialAtlas";
-				XROS_DEPLOYMENT_TARGET = 26.0;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -475,15 +354,6 @@
 			buildConfigurations = (
 				CA25C23D2E92BCC700A50417 /* Debug */,
 				CA25C23E2E92BCC700A50417 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		CA25C2412E92BCC700A50417 /* Build configuration list for PBXNativeTarget "TRSpatialAtlasTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				CA25C2422E92BCC700A50417 /* Debug */,
-				CA25C2432E92BCC700A50417 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
