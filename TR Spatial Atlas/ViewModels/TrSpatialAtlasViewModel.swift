@@ -58,7 +58,7 @@ class TrSpatialAtlasViewModel {
 
         // 2) Customize behavior (tweak as needed for your UX)
         manipulation.releaseBehavior = .stay // keep where user leaves it
-        manipulation.dynamics.translationBehavior = .none
+        manipulation.dynamics.translationBehavior = .unconstrained
         manipulation.dynamics.primaryRotationBehavior = .none
         manipulation.dynamics.secondaryRotationBehavior = .none
         manipulation.dynamics.scalingBehavior = .unconstrained
