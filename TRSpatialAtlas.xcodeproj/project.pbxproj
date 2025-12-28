@@ -21,18 +21,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		CA25C2192E92BCC600A50417 /* TR Spatial Atlas.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TR Spatial Atlas.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA25C2192E92BCC600A50417 /* TRSpatialAtlas.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TRSpatialAtlas.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA25C21D2E92BCC600A50417 /* RealityKitContent */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = RealityKitContent; sourceTree = "<group>"; };
-		CA25C2352E92BCC700A50417 /* TR Spatial AtlasTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "TR Spatial AtlasTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA25C2352E92BCC700A50417 /* TRSpatialAtlasTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TRSpatialAtlasTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		CA25C23B2E92BCC700A50417 /* Exceptions for "TR Spatial Atlas" folder in "TR Spatial Atlas" target */ = {
+		CA25C23B2E92BCC700A50417 /* Exceptions for "TR Spatial Atlas" folder in "TRSpatialAtlas" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = CA25C2182E92BCC600A50417 /* TR Spatial Atlas */;
+			target = CA25C2182E92BCC600A50417 /* TRSpatialAtlas */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -40,7 +40,7 @@
 		CA25C21B2E92BCC600A50417 /* TR Spatial Atlas */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				CA25C23B2E92BCC700A50417 /* Exceptions for "TR Spatial Atlas" folder in "TR Spatial Atlas" target */,
+				CA25C23B2E92BCC700A50417 /* Exceptions for "TR Spatial Atlas" folder in "TRSpatialAtlas" target */,
 			);
 			path = "TR Spatial Atlas";
 			sourceTree = "<group>";
@@ -84,8 +84,8 @@
 		CA25C21A2E92BCC600A50417 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				CA25C2192E92BCC600A50417 /* TR Spatial Atlas.app */,
-				CA25C2352E92BCC700A50417 /* TR Spatial AtlasTests.xctest */,
+				CA25C2192E92BCC600A50417 /* TRSpatialAtlas.app */,
+				CA25C2352E92BCC700A50417 /* TRSpatialAtlasTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -101,9 +101,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		CA25C2182E92BCC600A50417 /* TR Spatial Atlas */ = {
+		CA25C2182E92BCC600A50417 /* TRSpatialAtlas */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = CA25C23C2E92BCC700A50417 /* Build configuration list for PBXNativeTarget "TR Spatial Atlas" */;
+			buildConfigurationList = CA25C23C2E92BCC700A50417 /* Build configuration list for PBXNativeTarget "TRSpatialAtlas" */;
 			buildPhases = (
 				CA25C2152E92BCC600A50417 /* Sources */,
 				CA25C2162E92BCC600A50417 /* Frameworks */,
@@ -116,17 +116,17 @@
 			fileSystemSynchronizedGroups = (
 				CA25C21B2E92BCC600A50417 /* TR Spatial Atlas */,
 			);
-			name = "TR Spatial Atlas";
+			name = TRSpatialAtlas;
 			packageProductDependencies = (
 				CA25C21E2E92BCC600A50417 /* RealityKitContent */,
 			);
 			productName = "TR Spatial Atlas";
-			productReference = CA25C2192E92BCC600A50417 /* TR Spatial Atlas.app */;
+			productReference = CA25C2192E92BCC600A50417 /* TRSpatialAtlas.app */;
 			productType = "com.apple.product-type.application";
 		};
-		CA25C2342E92BCC700A50417 /* TR Spatial AtlasTests */ = {
+		CA25C2342E92BCC700A50417 /* TRSpatialAtlasTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = CA25C2412E92BCC700A50417 /* Build configuration list for PBXNativeTarget "TR Spatial AtlasTests" */;
+			buildConfigurationList = CA25C2412E92BCC700A50417 /* Build configuration list for PBXNativeTarget "TRSpatialAtlasTests" */;
 			buildPhases = (
 				CA25C2312E92BCC700A50417 /* Sources */,
 				CA25C2322E92BCC700A50417 /* Frameworks */,
@@ -140,11 +140,11 @@
 			fileSystemSynchronizedGroups = (
 				CA25C2382E92BCC700A50417 /* TR Spatial AtlasTests */,
 			);
-			name = "TR Spatial AtlasTests";
+			name = TRSpatialAtlasTests;
 			packageProductDependencies = (
 			);
 			productName = "TR Spatial AtlasTests";
-			productReference = CA25C2352E92BCC700A50417 /* TR Spatial AtlasTests.xctest */;
+			productReference = CA25C2352E92BCC700A50417 /* TRSpatialAtlasTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -166,7 +166,7 @@
 					};
 				};
 			};
-			buildConfigurationList = CA25C2142E92BCC600A50417 /* Build configuration list for PBXProject "TR Spatial Atlas" */;
+			buildConfigurationList = CA25C2142E92BCC600A50417 /* Build configuration list for PBXProject "TRSpatialAtlas" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -180,8 +180,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				CA25C2182E92BCC600A50417 /* TR Spatial Atlas */,
-				CA25C2342E92BCC700A50417 /* TR Spatial AtlasTests */,
+				CA25C2182E92BCC600A50417 /* TRSpatialAtlas */,
+				CA25C2342E92BCC700A50417 /* TRSpatialAtlasTests */,
 			);
 		};
 /* End PBXProject section */
@@ -223,7 +223,7 @@
 /* Begin PBXTargetDependency section */
 		CA25C2372E92BCC700A50417 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = CA25C2182E92BCC600A50417 /* TR Spatial Atlas */;
+			target = CA25C2182E92BCC600A50417 /* TRSpatialAtlas */;
 			targetProxy = CA25C2362E92BCC700A50417 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -430,7 +430,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 7;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TR Spatial Atlas.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TR Spatial Atlas";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TRSpatialAtlas.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TRSpatialAtlas";
 				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Debug;
@@ -453,7 +453,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 7;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TR Spatial Atlas.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TR Spatial Atlas";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TRSpatialAtlas.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TRSpatialAtlas";
 				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Release;
@@ -461,7 +461,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		CA25C2142E92BCC600A50417 /* Build configuration list for PBXProject "TR Spatial Atlas" */ = {
+		CA25C2142E92BCC600A50417 /* Build configuration list for PBXProject "TRSpatialAtlas" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CA25C23F2E92BCC700A50417 /* Debug */,
@@ -470,7 +470,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		CA25C23C2E92BCC700A50417 /* Build configuration list for PBXNativeTarget "TR Spatial Atlas" */ = {
+		CA25C23C2E92BCC700A50417 /* Build configuration list for PBXNativeTarget "TRSpatialAtlas" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CA25C23D2E92BCC700A50417 /* Debug */,
@@ -479,7 +479,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		CA25C2412E92BCC700A50417 /* Build configuration list for PBXNativeTarget "TR Spatial AtlasTests" */ = {
+		CA25C2412E92BCC700A50417 /* Build configuration list for PBXNativeTarget "TRSpatialAtlasTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CA25C2422E92BCC700A50417 /* Debug */,
