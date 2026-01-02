@@ -4,12 +4,9 @@ import SwiftUI
 
 @Observable
 class TrSpatialAtlasViewModel {
-    private let contentEntity = Entity()
+    let contentEntity = Entity()  // Made public for gesture access
     private let constants = Constants()
     private let decoder = JSONDecoder()
-    
-    // RealityKit 26: unified manipulation (move/rotate/scale)
-    private var manipulation = ManipulationComponent()
     
     // Loading state
     var isLoading = false
@@ -40,25 +37,12 @@ class TrSpatialAtlasViewModel {
         // SCALE UP the map - for better visibility
         contentEntity.scale = [1.5, 0.5, 1.5]
 
-        // Enable hand manipulation on the whole map surface
-        // 1) Add InputTarget + Collision via helper (approximate flat map bounds)
-        ManipulationComponent.configureEntity(
-            contentEntity,
-            collisionShapes: [
-                .generateBox(width: 3.0, height: 0.05, depth: 3.0)
-            ]
-        )
-
-        // 2) Customize behavior (tweak as needed for your UX)
-        manipulation.releaseBehavior = .stay // keep where user leaves it
-        manipulation.dynamics.translationBehavior = .unconstrained
-        manipulation.dynamics.primaryRotationBehavior = .none
-        manipulation.dynamics.secondaryRotationBehavior = .none
-        manipulation.dynamics.scalingBehavior = .unconstrained
-        manipulation.dynamics.inertia = .high
-
-        // 3) Attach the component
-        contentEntity.components.set(manipulation)
+        // Add InputTarget + Collision for gesture interaction
+        // These are REQUIRED for DragGesture and MagnifyGesture to work
+        contentEntity.components.set(InputTargetComponent())
+        contentEntity.components.set(CollisionComponent(shapes: [
+            .generateBox(width: 3.0, height: 0.1, depth: 3.0)
+        ]))
         
         return contentEntity
     }
