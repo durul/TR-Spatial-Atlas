@@ -33,13 +33,6 @@ class TrSpatialAtlasViewModel {
     }()
 
     func setupContentEntity() -> Entity {
-        //
-        //        // Place the object on the ground (y=0)
-        //        entity.position = [0, 0, -1]
-        //
-        //  Move the object to the right (x=0.5) or entity.position = [0, 1.5, -1]
-        contentEntity.position = [0.5, 1.5, -2.5]
-        
         // Lay the map flat (rotate 90° around X axis - parallel to ground)
         let xRotation = simd_quatf(angle: -.pi / 2, axis: SIMD3<Float>(1, 0, 0))
         contentEntity.transform.rotation = xRotation
