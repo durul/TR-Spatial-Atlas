@@ -125,22 +125,6 @@ let brightness: CGFloat = 0.6 + (CGFloat(i % 4) * 0.1)
 - **Vertex Simplification**: Polygons with 255+ vertices are simplified.
 - **Z-Fighting Prevention**: Each province at a unique Y height.
 
-## 🖐️ Hand Manipulation
-
-The map supports natural hand interaction via RealityKit's `ManipulationComponent`:
-
-```swift
-ManipulationComponent.configureEntity(
-    contentEntity,
-    collisionShapes: [.generateBox(width: 3.0, height: 0.05, depth: 3.0)]
-)
-
-manipulation.releaseBehavior = .stay
-manipulation.dynamics.translationBehavior = .unconstrained
-manipulation.dynamics.scalingBehavior = .unconstrained
-manipulation.dynamics.inertia = .high
-```
-
 ## 📍 Head-Relative Positioning
 
 The map uses ARKit's `WorldTrackingProvider` to spawn in front of the user:
@@ -200,7 +184,6 @@ let entity = ModelEntity(mesh: mesh, materials: [material])
 1. **🎯 Interactivity**: Click on provinces to display information
 2. **📊 Data Layers**: Population, income, tourism data overlay
 3. **🎨 Animation**: Dynamic elevation of provinces
-4. **📱 Gesture Support**: Enhanced pinch-to-zoom, rotate
 
 ---
 
