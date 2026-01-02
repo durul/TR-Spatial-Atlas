@@ -248,6 +248,9 @@ class TrSpatialAtlasViewModel {
         // Sort polygons by size - take the largest ones
         var polygonData: [(vertices: [SIMD3<Float>], area: Float)] = []
         
+        // Small Y offset per province to prevent z-fighting at boundaries
+        let yOffset: Float = 0.001 + Float(index) * 0.0001
+        
         for polygonCoordinates in multiPolygonCoordinates {
             guard let outerRing = polygonCoordinates.first else { continue }
             
@@ -258,7 +261,7 @@ class TrSpatialAtlasViewModel {
                 let latitude = Float(point[1])
                 let x = (longitude - constants.center.x) * constants.scaleFactor
                 let z = (latitude - constants.center.y) * constants.scaleFactor
-                let y: Float = 0.001
+                let y: Float = yOffset
                 vertices.append(SIMD3<Float>(x, y, z))
             }
             
@@ -331,6 +334,9 @@ class TrSpatialAtlasViewModel {
         var allIndices: [UInt32] = []
         let currentIndexOffset: UInt32 = 0
         
+        // Small Y offset per province to prevent z-fighting at boundaries
+        let yOffset: Float = 0.001 + Float(index) * 0.0001
+        
         // Take only OUTER BOUNDARY (first ring), skip inner holes
         guard let outerRing = coordinates.first else { return }
         
@@ -341,7 +347,7 @@ class TrSpatialAtlasViewModel {
             let latitude = Float(point[1])
             let x = (longitude - constants.center.x) * constants.scaleFactor
             let z = (latitude - constants.center.y) * constants.scaleFactor
-            let y: Float = 0.001
+            let y: Float = yOffset
             vertices.append(SIMD3<Float>(x, y, z))
         }
         
