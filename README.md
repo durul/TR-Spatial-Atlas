@@ -218,4 +218,11 @@ let entity = ModelEntity(mesh: mesh, materials: [material])
 
 ---
 
+## 📚 Resources & Inspiration
+
+- [WWDC Video](https://developer.apple.com/videos/play/wwdc2025/313/)
+- [Data Viz: Creating a Data Visualization Dashboard](https://developer.apple.com/documentation/charts/creating-a-data-visualization-dashboard-with-swift-charts) - Interesting example project, specifically showing data points on a US map.
+
+---
+
 **Special Note:** The **Winding Order** and **Z-Fighting** issues encountered in this project are common problems in 3D graphics programming. These solutions can be applied to similar projects! 🎯
