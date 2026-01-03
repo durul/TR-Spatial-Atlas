@@ -39,22 +39,23 @@ I --> J[Hand Manipulation Enabled]
 TR Spatial Atlas/
 ├── TRSpatialAtlas/
 │   ├── App/
-│   │   └── TR_Spatial_AtlasApp.swift    # Main application entry point
+│   │   └── TR_Spatial_AtlasApp.swift      # Main application entry point
 │   ├── Model/
-│   │   ├── AppModel.swift               # Application state management
-│   │   └── GeoJSONDataDTO.swift         # GeoJSON data models
+│   │   ├── AppModel.swift                 # Application state management
+│   │   ├── GeoJSONDataDTO.swift           # GeoJSON data models
+│   │   └── GestureControlViewModel.swift  # Gesture handling (drag, scale, rotate)
 │   ├── ViewModels/
-│   │   └── TrSpatialAtlasViewModel.swift # Main business logic
+│   │   └── TrSpatialAtlasViewModel.swift  # Main business logic & 3D rendering
 │   ├── Views/
-│   │   ├── ContentView.swift            # Main window UI
-│   │   ├── ImmersiveView.swift          # 3D immersive space with ARKit
-│   │   └── ToggleImmersiveSpaceButton.swift # Toggle button for immersive space
-│   ├── Turkey.geojson                   # 81 provinces map data
+│   │   ├── ContentView.swift              # Main window UI
+│   │   ├── ImmersiveMapView.swift         # 3D immersive space with ARKit
+│   │   └── ToggleImmersiveSpaceButton.swift
+│   ├── Turkey.geojson                     # 81 provinces map data (241KB)
 │   └── Info.plist
 ├── Packages/
-│   └── RealityKitContent/               # RealityKit content package
+│   └── RealityKitContent/                 # RealityKit content package
 └── scripts/
-    └── validate_repo.sh                 # Git repo validation script
+    └── validate_repo.sh                   # Git repo validation script
 ```
 
 ## 🎯 Project Story and Challenges
@@ -141,21 +142,36 @@ let brightness: CGFloat = 0.6 + (CGFloat(i % 4) * 0.1)
 - **Vertex Simplification**: Polygons with 255+ vertices are simplified.
 - **Z-Fighting Prevention**: Each province at a unique Y height.
 
+## 🖐️ Hand Gestures
+
+Gesture control is managed by `GestureControlViewModel` using SwiftUI gestures:
+
+| Gesture                | Action | Description                    |
+| ---------------------- | ------ | ------------------------------ |
+| 🖐️ **DragGesture**     | Move   | Drag the map in 3D space       |
+| 🤏 **MagnifyGesture**  | Scale  | Pinch to zoom in/out           |
+| 🔄 **RotateGesture3D** | Rotate | Rotate while scaling (15° min) |
+
+```swift
+// GestureControlViewModel handles all gestures
+@State private var gestureVM = GestureControlViewModel()
+
+RealityView { content in ... }
+    .gesture(gestureVM.createTranslationGesture())
+    .gesture(gestureVM.createScaleGesture())  // Includes RotateGesture3D
+```
+
 ## 📍 Head-Relative Positioning
 
 The map uses ARKit's `WorldTrackingProvider` to spawn in front of the user:
 
 ```swift
 let deviceAnchor = worldTracking.queryDeviceAnchor(atTimestamp: CACurrentMediaTime())
-let headPosition = SIMD3<Float>(headTransform.columns.3.x, ...)
 let headForward = SIMD3<Float>(-headTransform.columns.2.x, 0, -headTransform.columns.2.z)
-
-// Place map 2.5m in front of user
 let mapPosition = headPosition + normalize(headForward) * 2.5
-entity.position = SIMD3<Float>(mapPosition.x, headPosition.y - 0.3, mapPosition.z)
 ```
 
-**Fallback**: In simulator or when tracking fails, defaults to `(0, 1.2, -2.5)`.
+**Fallback**: In simulator defaults to `(0, 1.2, -2.5)`.
 
 ## 🔧 Development Details
 
