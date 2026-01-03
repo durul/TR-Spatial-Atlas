@@ -13,18 +13,32 @@ import SwiftUI
 struct ImmersiveView: View {
     @Environment(TrSpatialAtlasViewModel.self) var viewModel
     
+    // MARK: ARKit session states
+
     @State private var arkitSession = ARKitSession()
+    
+    // The device provides 6DoF (position + orientation) tracking.
     @State private var worldTracking = WorldTrackingProvider()
     
-    // For gestures
+    // MARK: Gestures
+
+    // To maintain the "initial position" during dragging, use .zero for "not yet started".
     @State private var initialPosition: SIMD3<Float> = .zero
+    
+    // When the magnify (pinch) gesture ends, the final scale remains here.
     @State private var baseScale: SIMD3<Float> = [1.5, 0.5, 1.5]
-    @State private var baseRotation: simd_quatf = simd_quatf(angle: -.pi / 2, axis: SIMD3<Float>(1, 0, 0))
+    
+    // -90° around the X-axis.
+    @State private var baseRotation: simd_quatf = .init(angle: -.pi / 2, axis: SIMD3<Float>(1, 0, 0))
 
     var body: some View {
         RealityView { content in
+            
+            // 3D scene setup, position, rotation
             let entity = viewModel.setupContentEntity()
             content.add(entity)
+            
+            // Initiating GeoJSON loading.
             viewModel.makePolygon()
             
             // Position the map in front of the user when the view appears
@@ -125,8 +139,11 @@ struct ImmersiveView: View {
         try? await Task.sleep(for: .milliseconds(200))
         
         // Default position (used as fallback for simulator)
+        // 2.5m in front of the user (negative z), 1.2m in height.
         let defaultPosition = SIMD3<Float>(0, 1.2, -2.5)
         
+        // deviceAnchor provides the position and orientation (pose) of the Vision Pro in 3D space.
+        // It is used to understand where the user is looking.
         guard let deviceAnchor = worldTracking.queryDeviceAnchor(atTimestamp: CACurrentMediaTime()) else {
             print("Could not get device anchor, using default position")
             await MainActor.run {
@@ -139,6 +156,7 @@ struct ImmersiveView: View {
         let headTransform = deviceAnchor.originFromAnchorTransform
         
         // Extract head position
+        // I get the translation (x, y, z) from the 4th column of the 4x4 matrix.
         let headPosition = SIMD3<Float>(
             headTransform.columns.3.x,
             headTransform.columns.3.y,
@@ -156,15 +174,21 @@ struct ImmersiveView: View {
             return
         }
         
-        // Forward direction (negative Z in the head's local space, horizontal only)
+        /*
+         • Forward direction (negative Z in the head's local space, horizontal only)
+         • Matrix's columns.2 is generally the "forward/back" axis (z-axis).
+         • You take its negative and use it as the "viewing direction".
+         */
         let headForward = SIMD3<Float>(
             -headTransform.columns.2.x,
             0,
             -headTransform.columns.2.z
         )
+        
+        // I'm setting Y to 0 to make the direction horizontal (so the map stays parallel to the ground, even if the head is looking up or down).
         let normalizedForward = normalize(headForward)
         
-        // Place the map 2.5 meters in front of the user
+        // Place the map 2.5 meters in front of the user's head
         let distance: Float = 2.5
         let mapPosition = headPosition + normalizedForward * distance
         

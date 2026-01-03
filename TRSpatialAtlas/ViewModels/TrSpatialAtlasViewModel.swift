@@ -4,7 +4,7 @@ import SwiftUI
 
 @Observable
 class TrSpatialAtlasViewModel {
-    let contentEntity = Entity()  // Made public for gesture access
+    let contentEntity = Entity() // Made public for gesture access
     private let constants = Constants()
     private let decoder = JSONDecoder()
     
@@ -99,13 +99,11 @@ class TrSpatialAtlasViewModel {
         
         var processedCount = 0
         var skippedCount = 0
-//
-//        // DEBUG: Sadece KONYA'yı göster
-//        let testFeatures = features.filter { $0.properties?.name == "Konya" }
-//        print("🔍 DEBUG: Testing with \(testFeatures.count) feature(s)")
-//
-//        for (index, feature) in testFeatures.enumerated() {
-//
+        //
+        // // DEBUG: Show only KONYA
+        // let testFeatures = features.filter { $0.properties?.name == "Konya" }
+        // print("🔍 DEBUG: Testing with \(testFeatures.count) feature(s)")
+
         for (index, feature) in features.enumerated() {
             switch feature.geometry.type {
             case "Point":

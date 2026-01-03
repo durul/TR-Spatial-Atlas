@@ -17,6 +17,22 @@ and showcases the power of **Spatial Computing** on VisionOS.
 - **Head-Relative Positioning**: Map spawns directly in front of the user using ARKit head tracking.
 - **Hand Manipulation**: Move, rotate, and scale the map with your hands.
 
+## 🎮 Application Flow
+
+```mermaid
+flowchart LR
+A[Application Start] --> B[Display ContentView]
+B --> C[Show Immersive Space Button]
+C --> D[Open ImmersiveView]
+D --> E[setupContentEntity]
+E --> F[makePolygon]
+F --> G[loadGeoJSONData]
+G --> H[processFeatures]
+H --> I[3D Rendering of 81 Provinces]
+I --> J[Hand Manipulation Enabled]
+
+```
+
 ## Project Structure
 
 ```
