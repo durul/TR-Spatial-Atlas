@@ -22,7 +22,7 @@ struct TR_Spatial_AtlasApp: App {
         .windowResizability(.contentMinSize)
 
         ImmersiveSpace(id: appModel.immersiveSpaceID) {
-            ImmersiveView()
+            ImmersiveMapView()
                 .environment(appModel)
                 .environment(viewModel)
                 .onAppear {
