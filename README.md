@@ -20,17 +20,16 @@ and showcases the power of **Spatial Computing** on VisionOS.
 ## 🎮 Application Flow
 
 ```mermaid
-flowchart LR
-A[Application Start] --> B[Display ContentView]
-B --> C[Show Immersive Space Button]
-C --> D[Open ImmersiveView]
-D --> E[setupContentEntity]
-E --> F[makePolygon]
-F --> G[loadGeoJSONData]
-G --> H[processFeatures]
-H --> I[3D Rendering of 81 Provinces]
-I --> J[Hand Manipulation Enabled]
-
+flowchart TD
+    A[🚀 Application Start] --> B[📱 ContentView]
+    B --> C[🔘 Show Turkey Map Button]
+    C --> D[🌍 ImmersiveMapView]
+    D --> E[⚙️ setupContentEntity]
+    E --> F[🗺️ makePolygon]
+    F --> G[📂 loadGeoJSONData]
+    G --> H[🔄 processFeatures]
+    H --> I[🎨 81 Provinces Rendered]
+    I --> J[🖐️ Hand Gestures Enabled]
 ```
 
 ## Project Structure
