@@ -117,6 +117,7 @@ let yOffset: Float = baseHeight + Float(index) * smallIncrement
 - **VisionOS 26** - Apple Vision Pro operating system.
 - **SwiftUI** - User interface.
 - **RealityKit** - 3D graphics and polygon rendering.
+- **ARKitSessionManager** - Handles AR session lifecycle and world/head tracking.
 - **ARKit** - Head tracking for user-relative positioning.
 - **GeoJSON** - Turkey map data (81 provinces + islands).
 - **Mixed Reality** - Mixed reality experience.
@@ -162,9 +163,11 @@ RealityView { content in ... }
 
 ## 📍 Head-Relative Positioning
 
-The map uses ARKit's `WorldTrackingProvider` to spawn in front of the user:
+The map uses `ARKitSessionManager` (wrapping `WorldTrackingProvider`) to spawn in front of the user.
+This ensures the map is always placed at a comfortable distance relative to the user's head position at launch.
 
 ```swift
+// Validates head position and avoids race conditions during session start
 let deviceAnchor = worldTracking.queryDeviceAnchor(atTimestamp: CACurrentMediaTime())
 let headForward = SIMD3<Float>(-headTransform.columns.2.x, 0, -headTransform.columns.2.z)
 let mapPosition = headPosition + normalize(headForward) * 2.5
