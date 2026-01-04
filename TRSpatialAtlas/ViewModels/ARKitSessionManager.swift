@@ -76,13 +76,21 @@ class ARKitSessionManager: ObservableObject {
             return
         }
         
+        // MARK: Get the device (head) transform
+
         let headTransform = deviceAnchor.originFromAnchorTransform
+        
+        // MARK: Extract head position
+
+        // I get the translation (x, y, z) from the 4th column of the 4x4 matrix.
+        // columns.3 → The device's position in the world (translation)
         let headPosition = SIMD3<Float>(
             headTransform.columns.3.x,
             headTransform.columns.3.y,
             headTransform.columns.3.z
         )
         
+        // Validate head position (simulator often returns weird values)
         let isValidHeadPosition = headPosition.y > 0.5 && headPosition.y < 3.0
         
         if !isValidHeadPosition {
@@ -90,6 +98,8 @@ class ARKitSessionManager: ObservableObject {
             entity.position = defaultPosition
             return
         }
+        
+        // MARK: Forward direction
         
         /*
          • Forward direction (negative Z in the head's local space, horizontal only)
