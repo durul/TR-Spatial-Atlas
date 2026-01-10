@@ -51,6 +51,7 @@ class TrSpatialAtlasViewModel {
         isLoading = true
         loadingProgress = "Loading GeoJSON data..."
         
+        // Parsing Turkey.geojson
         constants.mapDataFiles.forEach { fileName in
             loadGeoJSONData(fileName: fileName)
         }
@@ -75,19 +76,12 @@ class TrSpatialAtlasViewModel {
             print("✅ GeoJSON decoded successfully!")
             print("📊 Total features: \(geoJSON.features.count)")
             
-            // Print first few province names
-            for (index, feature) in geoJSON.features.prefix(5).enumerated() {
-                if let name = feature.properties?.name {
-                    print("   [\(index)] \(name)")
-                }
-            }
-            
             loadingProgress = "Creating 3D models..."
             processFeatures(geoJSON.features)
         } catch {
             print("❌ Error loading GeoJSON: \(error)")
             if let decodingError = error as? DecodingError {
-                print("   Decoding error details: \(decodingError)")
+                print("Decoding error details: \(decodingError)")
             }
             loadingProgress = "Error: \(error.localizedDescription)"
         }

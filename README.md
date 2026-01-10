@@ -177,14 +177,32 @@ let mapPosition = headPosition + normalize(headForward) * 2.5
 
 ## 🔧 Development Details
 
-### **Coordinate Transformation:**
+### **🔧 Configuration & Constants Explained**
+
+The `Constants` struct in `TrSpatialAtlasViewModel.swift` is crucial for correct 3D positioning:
+
+#### **1. `center` (35.0, 39.0) - Why is it needed?**
+
+GeoJSON data uses real-world latitude/longitude (e.g., Istanbul: 29°E, 41°N). If we used these values directly in the 3D scene:
+
+- The map would spawn far away from the scene origin `(0,0,0)` (e.g., 35 meters right, 39 meters forward).
+- Rotating the map would be difficult because it would orbit around the origin (0,0,0) rather than spinning around its own center.
+
+**Solution**: We define a `center` point (near Ankara) and subtract it from every coordinate (`longitude - center.x`). This shifts the map's center to the scene's origin `(0,0,0)`.
+
+#### **2. `scaleFactor` (0.05) - Why is it needed?**
+
+Geographic coordinate degrees do not map 1:1 to RealityKit's meter system.
+
+- Without scaling, the map would be either massive or tiny.
+- A factor of `0.05` scales the country down to a comfortable tabletop or room-scale size for the user.
+
+#### **3. `mapDataFiles` - Why is it needed?**
+
+This array defines which GeoJSON files to load. Currently, it contains only `["Turkey"]`, but it allows for easy extensibility. You can add new files like `["Turkey", "Istanbul_Detailed", "Lakes"]` without modifying the core logic.
 
 ```swift
-// Center of Turkey: Near Ankara
-let center: SIMD2<Float> = [35.0, 39.0]
-let scaleFactor: Float = 0.05
-
-// Convert GeoJSON coordinates to 3D space
+// Code Implementation
 let x = (longitude - center.x) * scaleFactor
 let z = (latitude - center.y) * scaleFactor
 let y: Float = yOffset  // Unique per province to prevent z-fighting

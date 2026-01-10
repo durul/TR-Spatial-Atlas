@@ -9,10 +9,12 @@ import Foundation
 
 public struct Constants {
     // Turkey coordinate center (longitude, latitude) - near Ankara
+    // used to shift the map to (0,0,0) in the 3D scene
     let center: SIMD2<Float> = [35.0, 39.0]
 
     // Scaling factor for Turkey - visible size
-    let scaleFactor: Float = 0.05 // SMALL - to fit in field of view
+    // Scales the map to approx. 1.5 meters wide (tabletop size)
+    let scaleFactor: Float = 0.05
 
     let mapDataFiles = [
         "Turkey"
