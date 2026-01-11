@@ -4,15 +4,19 @@ import SwiftUI
 
 @Observable
 class TrSpatialAtlasViewModel {
+    // MARK: - Properties
+
     let contentEntity = Entity() // Made public for gesture access
     private let constants = Constants()
     private let decoder = JSONDecoder()
     
-    // Loading state
+    // MARK: Loading state
+
     var isLoading = false
     var loadingProgress = ""
     
-    // Color palette for 81 provinces
+    // MARK: Color palette for 81 provinces
+
     private let provinceColors: [UIColor] = {
         var colors: [UIColor] = []
         
@@ -28,6 +32,8 @@ class TrSpatialAtlasViewModel {
         
         return colors
     }()
+
+    // MARK: - Setup Entity
 
     func setupContentEntity() -> Entity {
         // Lay the map flat (rotate 90° around X axis - parallel to ground)
@@ -46,6 +52,8 @@ class TrSpatialAtlasViewModel {
         
         return contentEntity
     }
+
+    // MARK: - Data Handling
 
     func makePolygon() {
         isLoading = true
@@ -87,6 +95,9 @@ class TrSpatialAtlasViewModel {
         }
     }
     
+    // MARK: (Distribution Center / Dispatcher)
+    
+    // It analyzes the raw data stream coming from GeoJSON.
     private func processFeatures(_ features: [GeoJSONFeature]) {
         let startTime = CFAbsoluteTimeGetCurrent()
         print("Processing \(features.count) features...")
@@ -126,10 +137,21 @@ class TrSpatialAtlasViewModel {
         print("   Processing time: \(String(format: "%.2f", processingTime)) seconds")
     }
     
+    // MARK: - Geometry Builders
+
+    // That function ensures only works with valid "Point" data.
+    // NOTE: This function is kept for future scalability.
+    // It will be used to visualize point-based data such as:
+    // - Earthquake epicenters
+    // - City capitals
+    // - Specific POIs like bus stops or stores
     private func createPointMarker(feature: GeoJSONFeature, index: Int) {
+        // Checks the valid "Point" data.
+        // If coordinate data is missing or does not contain latitude/longitude (at least 2 values), the function stops executing (returns).
         guard case .point(let coordinates) = feature.geometry.coordinates,
               coordinates.count >= 2 else { return }
         
+        // In the GeoJSON format, the first value is usually Longitude, and the second value is Latitude.
         let longitude = Float(coordinates[0])
         let latitude = Float(coordinates[1])
         
@@ -149,6 +171,12 @@ class TrSpatialAtlasViewModel {
         contentEntity.addChild(sphereEntity)
     }
     
+    // NOTE: This function is currently unused with the Turkey.geojson file but is kept for future features.
+    // It will be used to visualize line-based geometries such as:
+    // - Province borders (Distinct boundary lines)
+    // - Roads / Highways (Yollar / Otoyollar)
+    // - Rivers (Nehirler / Akarsu yatakları)
+    // - Routes (e.g., Flight paths or navigation)
     private func createLineString(feature: GeoJSONFeature, index: Int) {
         guard case .lineString(let coordinates) = feature.geometry.coordinates else { return }
         
@@ -187,7 +215,7 @@ class TrSpatialAtlasViewModel {
             let cylinderEntity = ModelEntity(mesh: cylinder, materials: [material])
             cylinderEntity.position = center
             
-            // Rotasyon hesapla
+            // Calculate rotation
             let normalizedDirection = normalize(direction)
             let upVector = SIMD3<Float>(0, 1, 0)
             let angle = acos(dot(upVector, normalizedDirection))
@@ -288,6 +316,9 @@ class TrSpatialAtlasViewModel {
         print("✓ Created \(provinceName) with \(polygonCount)/\(multiPolygonCoordinates.count) significant polygons")
     }
     
+    // MARK: Creates a single province Entity
+
+    // It creates a single province or region (e.g., Ankara) as a 3D model (Entity).
     private func createPolygon(feature: GeoJSONFeature, index: Int) {
         guard case .polygon(let coordinates) = feature.geometry.coordinates else { return }
         
@@ -309,6 +340,9 @@ class TrSpatialAtlasViewModel {
         // Take only OUTER BOUNDARY (first ring), skip inner holes
         guard let outerRing = coordinates.first else { return }
         
+        // MARK: Coordinate Transformation
+        
+        // Converts latitude/longitude data into X/Z coordinates in a 3D world.
         var vertices: [SIMD3<Float>] = []
         for point in outerRing {
             guard point.count >= 2 else { continue }
@@ -361,6 +395,8 @@ class TrSpatialAtlasViewModel {
         }
     }
     
+    // MARK: - Helpers
+
     // Simplify large polygons to reduce vertex count
     private func createSubdividedPolygon(vertices: [SIMD3<Float>], color: UIColor) {
         guard vertices.count >= 3 else { return }

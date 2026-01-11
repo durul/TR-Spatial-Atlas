@@ -50,15 +50,19 @@ struct GeoJSONGeometry: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         type = try container.decode(String.self, forKey: .type)
 
-        // Decode coordinates based on geometry type
+        // MARK: Decode coordinates based on geometry type
+
+        // A single decode command can accurately convert thousands of different geometry types (Point, Line, Polygon) into Swift enums (GeoJSONCoordinates).
         switch type {
         case "Point":
+            // Reads the coordinates as [Double]
             let coords = try container.decode([Double].self, forKey: .coordinates)
             coordinates = .point(coords)
         case "LineString":
             let coords = try container.decode([[Double]].self, forKey: .coordinates)
             coordinates = .lineString(coords)
         case "Polygon":
+            // Reads the coordinates as [[[Double]]] (a 3-dimensional array)
             let coords = try container.decode([[[Double]]].self, forKey: .coordinates)
             coordinates = .polygon(coords)
         case "MultiPolygon":
