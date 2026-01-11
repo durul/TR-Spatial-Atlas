@@ -365,3 +365,21 @@ let entity = ModelEntity(mesh: mesh, materials: [material])
 ---
 
 **Special Note:** The **Winding Order** and **Z-Fighting** issues encountered in this project are common problems in 3D graphics programming. These solutions can be applied to similar projects! 🎯
+
+
+
+---
+
+## 📄 License
+
+This project is licensed under the BSD-3-Clause License - see the [LICENSE.txt](LICENSE.txt) file for details.
+
+---
+
+<div align="center">
+
+**Made with ❤️ for Apple Vision Pro**
+
+_Created by Durul Dalkanat © 2025_
+
+</div>
