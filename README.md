@@ -44,7 +44,9 @@ TR Spatial Atlas/
 │   │   ├── GeoJSONDataDTO.swift           # GeoJSON data models
 │   │   └── GestureControlViewModel.swift  # Gesture handling (drag, scale, rotate)
 │   ├── ViewModels/
-│   │   └── TrSpatialAtlasViewModel.swift  # Main business logic & 3D rendering
+│   │   └── TrSpatialAtlasViewModel.swift  # Core Logic: Data Handling, Dispatcher, 3D Builders, Helpers
+│   ├── Utilities/
+│   │   └── Logger+Extension.swift         # Centralized OSLog system (MapData, ContentGeneration, Performance)
 │   ├── Views/
 │   │   ├── ContentView.swift              # Main window UI
 │   │   ├── ImmersiveMapView.swift         # 3D immersive space with ARKit
@@ -110,6 +112,16 @@ vertices.reverse()  // Counter-clockwise → Suitable for RealityKit! ✅
 let yOffset: Float = baseHeight + Float(index) * smallIncrement
 ```
 
+**3. Vertex Limit & Downsampling:**
+
+VisionOS and RealityKit have vertex limits for a single mesh. We implemented a smart downsampling algorithm:
+
+```swift
+// If a polygon has > 255 vertices, reduce detail intelligently
+// Takes 1 out of every 'step' points to prevent crashes and FPS drops
+let step = Int(ceil(Double(vertices.count) / Double(targetVertexCount)))
+```
+
 ## 🏗️ Technical Architecture
 
 ### **Main Components:**
@@ -120,7 +132,27 @@ let yOffset: Float = baseHeight + Float(index) * smallIncrement
 - **ARKitSessionManager** - Handles AR session lifecycle and world/head tracking.
 - **ARKit** - Head tracking for user-relative positioning.
 - **GeoJSON** - Turkey map data (81 provinces + islands).
+- **OSLog** - Centralized, categorized, and performance-oriented logging system.
 - **Mixed Reality** - Mixed reality experience.
+
+### **Core Logic Breakdown (ViewModel):**
+
+The `TrSpatialAtlasViewModel` is organized into distinct responsibilities:
+
+1.  **Setup**: Prepares the RealityKit scene (Rotation, Gestures).
+2.  **Data Handling**: Loads and parses `Turkey.geojson`.
+3.  **Dispatcher**: `processFeatures` acts as a traffic controller, routing raw data to specific builders.
+4.  **Geometry Builders**: Specialized functions for `Point`, `LineString`, `Polygon`, and `MultiPolygon`.
+5.  **Helpers**: Critical performance tools like `createSubdividedPolygon`.
+
+### **Logging System:**
+
+We replaced standard `print()` statements with a centralized `Logger` extension (`Utilities/Logger+Extension.swift`) for better debugging and filtering in Console.app:
+
+- `Logger.mapData`: JSON parsing and file IO.
+- `Logger.contentGeneration`: Mesh creation and entity management.
+- `Logger.performance`: Benchmarking and optimization alerts.
+- `Logger.ui`: User interface events.
 
 ## 🎨 Visual Features
 
@@ -225,11 +257,12 @@ let entity = ModelEntity(mesh: mesh, materials: [material])
 ## 📊 Performance Optimizations
 
 - ✅ **Single GeoJSON File**: 81 provinces in a single file (241KB)
-- ✅ **Vertex Simplification**: 255+ vertices → automatic simplification
+- ✅ **Vertex Limit Management**: Critical for preventing crashes. Uses **Downsampling** to reduce vertex count while preserving shape.
 - ✅ **Island Filtering**: Small islands are automatically discarded
 - ✅ **Efficient Batching**: Entity group per province
 - ✅ **Z-Fighting Prevention**: Unique Y offset per province
 - ✅ **Optimized Scale**: `scaleFactor = 0.05` (optimal size)
+- ✅ **Structured Logging**: Zero-overhead logging with `OSLog` in Release builds.
 
 ## 🚀 Upcoming Enhancements
 
