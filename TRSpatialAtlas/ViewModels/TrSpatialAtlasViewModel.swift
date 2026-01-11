@@ -189,7 +189,7 @@ class TrSpatialAtlasViewModel {
         
         let processingTime = CFAbsoluteTimeGetCurrent() - startTime
         Logger.performance.notice("✅ Processing complete! Processed: \(processedCount), Skipped: \(skippedCount)")
-        Logger.contentGeneration.info("Total entities: \(contentEntity.children.count)")
+        Logger.contentGeneration.info("Total entities: \(self.contentEntity.children.count)")
         Logger.performance.notice("Processing time: \(String(format: "%.2f", processingTime)) seconds")
     }
     
