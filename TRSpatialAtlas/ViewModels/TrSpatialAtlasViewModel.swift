@@ -1,4 +1,5 @@
 import Observation
+import OSLog
 import RealityKit
 import SwiftUI
 
@@ -72,24 +73,23 @@ class TrSpatialAtlasViewModel {
         loadingProgress = "Processing \(fileName) file..."
         
         guard let fileUrl = Bundle.main.url(forResource: fileName, withExtension: "geojson") else {
-            print("GeoJSON file not found: \(fileName)")
+            Logger.mapData.error("GeoJSON file not found: \(fileName)")
             return
         }
 
         do {
             let jsonData = try Data(contentsOf: fileUrl)
-            print("📂 JSON data loaded: \(jsonData.count) bytes")
+            Logger.mapData.info("📂 JSON data loaded: \(jsonData.count) bytes")
             
             let geoJSON = try decoder.decode(GeoJSONData.self, from: jsonData)
-            print("✅ GeoJSON decoded successfully!")
-            print("📊 Total features: \(geoJSON.features.count)")
+            Logger.mapData.info("✅ GeoJSON decoded successfully! Total features: \(geoJSON.features.count)")
             
             loadingProgress = "Creating 3D models..."
             processFeatures(geoJSON.features)
         } catch {
-            print("❌ Error loading GeoJSON: \(error)")
+            Logger.mapData.error("❌ Error loading GeoJSON: \(error.localizedDescription)")
             if let decodingError = error as? DecodingError {
-                print("Decoding error details: \(decodingError)")
+                Logger.mapData.error("Decoding error details: \(decodingError.localizedDescription)")
             }
             loadingProgress = "Error: \(error.localizedDescription)"
         }
@@ -100,7 +100,7 @@ class TrSpatialAtlasViewModel {
     // It analyzes the raw data stream coming from GeoJSON.
     private func processFeatures(_ features: [GeoJSONFeature]) {
         let startTime = CFAbsoluteTimeGetCurrent()
-        print("Processing \(features.count) features...")
+        Logger.performance.info("Processing \(features.count) features...")
         
         var processedCount = 0
         var skippedCount = 0
@@ -124,17 +124,15 @@ class TrSpatialAtlasViewModel {
                 createMultiPolygon(feature: feature, index: index)
                 processedCount += 1
             default:
-                print("Skipping unsupported geometry type: \(feature.geometry.type)")
+                Logger.contentGeneration.warning("Skipping unsupported geometry type: \(feature.geometry.type)")
                 skippedCount += 1
             }
         }
         
         let processingTime = CFAbsoluteTimeGetCurrent() - startTime
-        print("✅ Processing complete!")
-        print("   Processed: \(processedCount) features")
-        print("   Skipped: \(skippedCount) features")
-        print("   Total entities: \(contentEntity.children.count)")
-        print("   Processing time: \(String(format: "%.2f", processingTime)) seconds")
+        Logger.performance.notice("✅ Processing complete! Processed: \(processedCount), Skipped: \(skippedCount)")
+        Logger.contentGeneration.info("Total entities: \(self.contentEntity.children.count)")
+        Logger.performance.notice("Processing time: \(String(format: "%.2f", processingTime)) seconds")
     }
     
     // MARK: - Geometry Builders
@@ -235,7 +233,7 @@ class TrSpatialAtlasViewModel {
         guard case .multiPolygon(let multiPolygonCoordinates) = feature.geometry.coordinates else { return }
         
         let provinceName = feature.properties?.name ?? "Unknown"
-        print("Creating MultiPolygon for \(provinceName) with \(multiPolygonCoordinates.count) polygons")
+        Logger.contentGeneration.debug("Creating MultiPolygon for \(provinceName) with \(multiPolygonCoordinates.count) polygons")
         
         // Different colors for 81 provinces
         let color = provinceColors[index % provinceColors.count]
@@ -310,12 +308,12 @@ class TrSpatialAtlasViewModel {
                 provinceGroup.addChild(polygonEntity)
                 polygonCount += 1
             } catch {
-                print("Error creating polygon part: \(error)")
+                Logger.contentGeneration.error("Error creating polygon part: \(error.localizedDescription)")
             }
         }
         
         contentEntity.addChild(provinceGroup)
-        print("✓ Created \(provinceName) with \(polygonCount)/\(multiPolygonCoordinates.count) significant polygons")
+        Logger.contentGeneration.info("✓ Created \(provinceName) with \(polygonCount)/\(multiPolygonCoordinates.count) significant polygons")
     }
     
     // MARK: Creates a single province Entity
@@ -325,7 +323,7 @@ class TrSpatialAtlasViewModel {
         guard case .polygon(let coordinates) = feature.geometry.coordinates else { return }
         
         let provinceName = feature.properties?.name ?? "Unknown"
-        print("Creating Polygon for \(provinceName)")
+        Logger.contentGeneration.debug("Creating Polygon for \(provinceName)")
         
         // Different colors for 81 provinces
         let color = provinceColors[index % provinceColors.count]
@@ -360,13 +358,13 @@ class TrSpatialAtlasViewModel {
         vertices.reverse()
         
         guard vertices.count >= 3 else {
-            print("Skipping \(provinceName): too few vertices")
+            Logger.contentGeneration.warning("Skipping \(provinceName): too few vertices")
             return
         }
         
         // Split large polygons into parts
         if vertices.count > 255 {
-            print("Subdividing polygon for \(provinceName) with \(vertices.count) vertices")
+            Logger.performance.info("Subdividing polygon for \(provinceName) with \(vertices.count) vertices")
             createSubdividedPolygon(vertices: vertices, color: color)
             return
         }
@@ -391,9 +389,9 @@ class TrSpatialAtlasViewModel {
             provinceEntity.name = provinceName
             contentEntity.addChild(provinceEntity)
             
-            print("✓ Created unified mesh for \(provinceName)")
+            Logger.contentGeneration.info("✓ Created unified mesh for \(provinceName)")
         } catch {
-            print("Error creating polygon for \(provinceName): \(error)")
+            Logger.contentGeneration.error("Error creating polygon for \(provinceName): \(error.localizedDescription)")
         }
     }
     
@@ -424,11 +422,11 @@ class TrSpatialAtlasViewModel {
         }
         
         guard simplifiedVertices.count >= 3, simplifiedVertices.count <= 255 else {
-            print("  Failed to simplify polygon: \(simplifiedVertices.count) vertices (step: \(step))")
+            Logger.performance.warning("  Failed to simplify polygon: \(simplifiedVertices.count) vertices (step: \(step))")
             return
         }
         
-        print("  ✓ Simplified from \(vertices.count) to \(simplifiedVertices.count) vertices (step: \(step))")
+        Logger.performance.debug("  ✓ Simplified from \(vertices.count) to \(simplifiedVertices.count) vertices (step: \(step))")
         
         let counts: [UInt8] = [UInt8(simplifiedVertices.count)]
         var indices: [UInt32] = []
@@ -448,7 +446,7 @@ class TrSpatialAtlasViewModel {
             let polygonEntity = ModelEntity(mesh: polygonMesh, materials: [material])
             contentEntity.addChild(polygonEntity)
         } catch {
-            print("  Error creating simplified polygon: \(error)")
+            Logger.contentGeneration.error("  Error creating simplified polygon: \(error.localizedDescription)")
         }
     }
 }
