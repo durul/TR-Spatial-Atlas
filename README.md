@@ -63,17 +63,33 @@ TR Spatial Atlas/
 
 During the development of this project, **two serious rendering issues** were encountered and resolved:
 
-### 🐛 Issue #1: "Confetti Effect" - Winding Order
+### 🐛 Issue #1: "Confetti Effect" - Winding Order & Backface Culling
 
-**Symptoms**: The map was rendering, but it appeared as **small colorful fragments like confetti**.
+**Symptoms**: The map was rendering, but it appeared as **small colorful fragments like confetti**. Additionally, when rotating between flat and vertical modes, some polygons would disappear.
 
 #### Root Cause & Solution
+
+**Part A - Winding Order:**
 
 - **Problem**: GeoJSON polygons were coming **clockwise**.
 - RealityKit expects **counter-clockwise**.
 - The polygons were facing **backwards** and were not visible!
 - **Solution**: Added `vertices.reverse()` to all vertex arrays.
-- **Result**: ✅ **ISSUE RESOLVED!** The entire map is displayed correctly!
+
+**Part B - Backface Culling (Map Rotation):**
+
+- **Problem**: When rotating the map from flat to vertical mode, some province polygons would disappear.
+- RealityKit performs **backface culling** by default - only front faces are visible.
+- When the map rotates, some polygon normals face away from the camera.
+- **Solution**: Set `faceCulling = .none` on all materials to make polygons **double-sided**:
+
+```swift
+var material = UnlitMaterial(color: color)
+material.blending = .transparent(opacity: 0.95)
+material.faceCulling = .none  // Double-sided for rotation
+```
+
+- **Result**: ✅ **ISSUE RESOLVED!** The entire map displays correctly in both flat and vertical modes!
 
 ### 🐛 Issue #2: Z-Fighting at Province Boundaries
 
