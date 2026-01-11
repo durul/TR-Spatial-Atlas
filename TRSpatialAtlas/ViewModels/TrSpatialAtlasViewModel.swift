@@ -75,11 +75,15 @@ class TrSpatialAtlasViewModel {
         if flat {
             // Flat: +90 degrees around X (parallel to ground, facing user)
             targetTransform.rotation = simd_quatf(angle: .pi / 2, axis: SIMD3<Float>(1, 0, 0))
+            // Reset Y position for flat mode
+            targetTransform.translation.y = contentEntity.transform.translation.y
             Logger.ui.info("Map rotating to FLAT mode")
         } else {
             // Upright: Vertical wall mode (no X rotation)
             targetTransform.rotation = simd_quatf(angle: 0, axis: SIMD3<Float>(1, 0, 0))
-            Logger.ui.info("Map rotating to UPRIGHT mode")
+            // Move map down in vertical mode so it's below the control panel
+            targetTransform.translation.y = contentEntity.transform.translation.y - 1.5
+            Logger.ui.info("Map rotating to UPRIGHT mode (moved down)")
         }
         
         // Use move(to:) with animation for smooth transition and reliable update
