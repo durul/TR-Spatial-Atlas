@@ -95,7 +95,7 @@ class TrSpatialAtlasViewModel {
         )
     }
     
-    /// Moves the control panel to top (for vertical map) or bottom (for flat map)
+    /// Moves the control panel to top (for vertical map) or bottom (for flat map) with animation
     func moveControlPanel(toTop: Bool) {
         guard let panel = controlPanelEntity else {
             Logger.ui.warning("Control panel entity not found")

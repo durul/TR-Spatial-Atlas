@@ -16,6 +16,8 @@ and showcases the power of **Spatial Computing** on VisionOS.
 - **81 Different Colors**: Each province is displayed in a unique HSB-generated color.
 - **Head-Relative Positioning**: Map spawns directly in front of the user using ARKit head tracking.
 - **Hand Manipulation**: Move, rotate, and scale the map with your hands.
+- **Map Mode Toggle**: Switch between flat (tabletop) and vertical (wall) modes with animated transitions.
+- **Dynamic Control Panel**: Control panel repositions automatically based on map orientation.
 
 ## 🎮 Application Flow
 
@@ -50,6 +52,7 @@ TR Spatial Atlas/
 │   ├── Views/
 │   │   ├── ContentView.swift              # Main window UI
 │   │   ├── ImmersiveMapView.swift         # 3D immersive space with ARKit
+│   │   ├── MapDetails.swift               # Map mode control panel (flat/vertical toggle)
 │   │   └── ToggleImmersiveSpaceButton.swift
 │   ├── Turkey.geojson                     # 81 provinces map data (241KB)
 │   └── Info.plist
@@ -138,6 +141,26 @@ VisionOS and RealityKit have vertex limits for a single mesh. We implemented a s
 let step = Int(ceil(Double(vertices.count) / Double(targetVertexCount)))
 ```
 
+**4. North-South Orientation (Coordinate System):**
+
+When the map is laid flat (parallel to ground), the Z-axis determines the north-south orientation. Negating the Z coordinate ensures correct geographic orientation:
+
+```swift
+// Without negation: South appears at the top (incorrect)
+// With negation: North is further from user, South is closer (correct)
+let z = -(latitude - constants.center.y) * constants.scaleFactor
+```
+
+**5. Rotation Angle Adjustment:**
+
+When the Z coordinate is negated, the rotation angle must also be adjusted to maintain the correct facing direction:
+
+```swift
+// Before Z negation: -.pi/2 (map faced away from user)
+// After Z negation: +.pi/2 (map faces toward user)
+let xRotation = simd_quatf(angle: .pi / 2, axis: SIMD3<Float>(1, 0, 0))
+```
+
 ## 🏗️ Technical Architecture
 
 ### **Main Components:**
@@ -209,7 +232,53 @@ RealityView { content in ... }
     .gesture(gestureVM.createScaleGesture())  // Includes RotateGesture3D
 ```
 
-## 📍 Head-Relative Positioning
+## �️ Map Mode Toggle
+
+The map supports two viewing modes with smooth animated transitions:
+
+| Mode                   | Description                                 | Control Panel Position |
+| ---------------------- | ------------------------------------------- | ---------------------- |
+| 🪑 **Flat (Tabletop)** | Map lies horizontal, parallel to the ground | Below the map (Y=0.5)  |
+| 🧱 **Vertical (Wall)** | Map stands upright like a wall display      | Above the map (Y=2.0)  |
+
+### Implementation Details:
+
+```swift
+// MapDetails.swift - Toggle button UI
+MapDetails(turnOnMapFlat: {
+    viewModel.rotateMap(flat: true)
+    viewModel.moveControlPanel(toTop: false)  // Panel moves down
+}, turnOffMapFlat: {
+    viewModel.rotateMap(flat: false)
+    viewModel.moveControlPanel(toTop: true)   // Panel moves up
+})
+
+// TrSpatialAtlasViewModel.swift - Animated rotation
+func rotateMap(flat: Bool) {
+    var targetTransform = contentEntity.transform
+    if flat {
+        targetTransform.rotation = simd_quatf(angle: .pi / 2, axis: SIMD3<Float>(1, 0, 0))
+    } else {
+        targetTransform.rotation = simd_quatf(angle: 0, axis: SIMD3<Float>(1, 0, 0))
+        targetTransform.translation.y -= 1.5  // Move map down in vertical mode
+    }
+    contentEntity.move(to: targetTransform, relativeTo: contentEntity.parent, duration: 0.5)
+}
+```
+
+### Key Features:
+
+- **Animated Transitions**: 0.5 second smooth animations using `Entity.move(to:)`
+- **Dynamic Control Panel**: Panel repositions to stay accessible in both modes
+- **Double-Sided Rendering**: `faceCulling = .none` ensures polygons are visible from both sides during rotation
+- **Billboard Effect**: Control panel uses `BillboardComponent()` to always face the user regardless of their position
+
+```swift
+// ImmersiveMapView.swift - Control panel always faces user
+sceneAttachment.components.set(BillboardComponent())
+```
+
+## �📍 Head-Relative Positioning
 
 The map uses `ARKitSessionManager` (wrapping `WorldTrackingProvider`) to spawn in front of the user.
 This ensures the map is always placed at a comfortable distance relative to the user's head position at launch.
