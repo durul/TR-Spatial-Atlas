@@ -229,6 +229,8 @@ class TrSpatialAtlasViewModel {
         }
     }
     
+    // MARK: Multiple polygons for island/fragmented provinces
+
     private func createMultiPolygon(feature: GeoJSONFeature, index: Int) {
         guard case .multiPolygon(let multiPolygonCoordinates) = feature.geometry.coordinates else { return }
         
@@ -398,6 +400,10 @@ class TrSpatialAtlasViewModel {
     // MARK: - Helpers
 
     // Simplify large polygons to reduce vertex count
+    // It is the most critical performance function. It manages the Vertex Limit, which is a constraint of RealityKit and Vision Pro.
+    // If a province's borders are too detailed (e.g., Muğla coasts, thousands of points), this function kicks in.
+    // Downsampling: It reduces the number of points (e.g., takes 1 out of every 3 points).
+    // This prevents the application from crashing and prevents FPS (frame rate) drops.
     private func createSubdividedPolygon(vertices: [SIMD3<Float>], color: UIColor) {
         guard vertices.count >= 3 else { return }
         
