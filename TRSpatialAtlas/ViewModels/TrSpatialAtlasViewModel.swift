@@ -16,6 +16,15 @@ class TrSpatialAtlasViewModel {
     var isLoading = false
     var loadingProgress = ""
     
+    // MARK: - Control Panel
+    
+    /// Reference to control panel attachment for dynamic positioning
+    var controlPanelEntity: Entity?
+    
+    /// Control panel positions for different map modes
+    private let controlPanelPositionFlat = SIMD3<Float>(0, 0.5, -1.2) // Below flat map
+    private let controlPanelPositionVertical = SIMD3<Float>(0, 2.0, -1.2) // Above vertical map
+    
     // MARK: Color palette for 81 provinces
 
     private let provinceColors: [UIColor] = {
@@ -37,8 +46,8 @@ class TrSpatialAtlasViewModel {
     // MARK: - Setup Entity
 
     func setupContentEntity() -> Entity {
-        // Lay the map flat (rotate 90° around X axis - parallel to ground)
-        let xRotation = simd_quatf(angle: -.pi / 2, axis: SIMD3<Float>(1, 0, 0))
+        // Lay the map flat (rotate 90° around X axis - parallel to ground, facing user)
+        let xRotation = simd_quatf(angle: .pi / 2, axis: SIMD3<Float>(1, 0, 0))
         contentEntity.transform.rotation = xRotation
         
         // SCALE UP the map - for better visibility
@@ -52,6 +61,55 @@ class TrSpatialAtlasViewModel {
         ]))
         
         return contentEntity
+    }
+
+    // MARK: - Interaction Logic
+    
+    /// Rotates the map between flat (tabletop) and upright (wall) modes
+    func rotateMap(flat: Bool) {
+        Logger.ui.debug("rotateMap called with flat: \(flat)")
+        
+        // Create target transform based on mode
+        var targetTransform = contentEntity.transform
+        
+        if flat {
+            // Flat: +90 degrees around X (parallel to ground, facing user)
+            targetTransform.rotation = simd_quatf(angle: .pi / 2, axis: SIMD3<Float>(1, 0, 0))
+            Logger.ui.info("Map rotating to FLAT mode")
+        } else {
+            // Upright: Vertical wall mode (no X rotation)
+            targetTransform.rotation = simd_quatf(angle: 0, axis: SIMD3<Float>(1, 0, 0))
+            Logger.ui.info("Map rotating to UPRIGHT mode")
+        }
+        
+        // Use move(to:) with animation for smooth transition and reliable update
+        contentEntity.move(
+            to: targetTransform,
+            relativeTo: contentEntity.parent,
+            duration: 0.5,
+            timingFunction: .easeInOut
+        )
+    }
+    
+    /// Moves the control panel to top (for vertical map) or bottom (for flat map)
+    func moveControlPanel(toTop: Bool) {
+        guard let panel = controlPanelEntity else {
+            Logger.ui.warning("Control panel entity not found")
+            return
+        }
+        
+        var targetTransform = panel.transform
+        targetTransform.translation = toTop ? controlPanelPositionVertical : controlPanelPositionFlat
+        
+        // Animate the control panel movement
+        panel.move(
+            to: targetTransform,
+            relativeTo: panel.parent,
+            duration: 0.5,
+            timingFunction: .easeInOut
+        )
+        
+        Logger.ui.info("Control panel moving to \(toTop ? "TOP" : "BOTTOM")")
     }
 
     // MARK: - Data Handling
@@ -131,7 +189,7 @@ class TrSpatialAtlasViewModel {
         
         let processingTime = CFAbsoluteTimeGetCurrent() - startTime
         Logger.performance.notice("✅ Processing complete! Processed: \(processedCount), Skipped: \(skippedCount)")
-        Logger.contentGeneration.info("Total entities: \(self.contentEntity.children.count)")
+        Logger.contentGeneration.info("Total entities: \(contentEntity.children.count)")
         Logger.performance.notice("Processing time: \(String(format: "%.2f", processingTime)) seconds")
     }
     
@@ -155,13 +213,14 @@ class TrSpatialAtlasViewModel {
         
         // Convert coordinates to 3D space
         let x = (longitude - constants.center.x) * constants.scaleFactor
-        let z = (latitude - constants.center.y) * constants.scaleFactor
+        let z = -(latitude - constants.center.y) * constants.scaleFactor // Negative for correct N-S orientation
         let y: Float = 0.01 // Height for point
         
         // Create sphere (larger size)
         let sphere = MeshResource.generateSphere(radius: 0.08)
         var material = UnlitMaterial(color: .red)
         material.blending = .transparent(opacity: 0.9)
+        material.faceCulling = .none // Double-sided for rotation
         
         let sphereEntity = ModelEntity(mesh: sphere, materials: [material])
         sphereEntity.position = SIMD3<Float>(x, y, z)
@@ -188,7 +247,7 @@ class TrSpatialAtlasViewModel {
             
             // Convert coordinates to 3D space
             let x = (longitude - constants.center.x) * constants.scaleFactor
-            let z = (latitude - constants.center.y) * constants.scaleFactor
+            let z = -(latitude - constants.center.y) * constants.scaleFactor // Negative for correct N-S orientation
             let y: Float = 0.002 // Slightly higher for province borders
             
             vertices.append(SIMD3<Float>(x, y, z))
@@ -209,6 +268,7 @@ class TrSpatialAtlasViewModel {
             let cylinder = MeshResource.generateCylinder(height: distance, radius: 0.005)
             var material = UnlitMaterial(color: .systemBlue) // Blue color - more prominent
             material.blending = .transparent(opacity: 1.0) // Fully opaque
+            material.faceCulling = .none // Double-sided for rotation
             
             let cylinderEntity = ModelEntity(mesh: cylinder, materials: [material])
             cylinderEntity.position = center
@@ -257,7 +317,7 @@ class TrSpatialAtlasViewModel {
                 let longitude = Float(point[0])
                 let latitude = Float(point[1])
                 let x = (longitude - constants.center.x) * constants.scaleFactor
-                let z = (latitude - constants.center.y) * constants.scaleFactor
+                let z = -(latitude - constants.center.y) * constants.scaleFactor // Negative for correct N-S orientation
                 let y: Float = yOffset
                 vertices.append(SIMD3<Float>(x, y, z))
             }
@@ -303,6 +363,7 @@ class TrSpatialAtlasViewModel {
                 let polygonMesh = try MeshResource.generate(from: [meshDescriptor])
                 var material = UnlitMaterial(color: color)
                 material.blending = .transparent(opacity: 0.95) // More opaque
+                material.faceCulling = .none // Double-sided for rotation
                 
                 let polygonEntity = ModelEntity(mesh: polygonMesh, materials: [material])
                 provinceGroup.addChild(polygonEntity)
@@ -349,7 +410,7 @@ class TrSpatialAtlasViewModel {
             let longitude = Float(point[0])
             let latitude = Float(point[1])
             let x = (longitude - constants.center.x) * constants.scaleFactor
-            let z = (latitude - constants.center.y) * constants.scaleFactor
+            let z = -(latitude - constants.center.y) * constants.scaleFactor // Negative for correct N-S orientation
             let y: Float = yOffset
             vertices.append(SIMD3<Float>(x, y, z))
         }
@@ -384,6 +445,7 @@ class TrSpatialAtlasViewModel {
             let provinceMesh = try MeshResource.generate(from: [meshDescriptor])
             var material = UnlitMaterial(color: color)
             material.blending = .transparent(opacity: 0.95) // More opaque
+            material.faceCulling = .none // Double-sided for rotation
             
             let provinceEntity = ModelEntity(mesh: provinceMesh, materials: [material])
             provinceEntity.name = provinceName
@@ -442,6 +504,7 @@ class TrSpatialAtlasViewModel {
             let polygonMesh = try MeshResource.generate(from: [meshDescriptor])
             var material = UnlitMaterial(color: color)
             material.blending = .transparent(opacity: 0.9)
+            material.faceCulling = .none // Double-sided for rotation
             
             let polygonEntity = ModelEntity(mesh: polygonMesh, materials: [material])
             contentEntity.addChild(polygonEntity)

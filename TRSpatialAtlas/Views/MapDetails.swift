@@ -38,7 +38,7 @@ struct MapDetails: View {
                         Text("Map Mode")
                             .font(.title2)
                             .fontWeight(.semibold)
-                        Text(mapFlatOn ? "Flat (Tabletop)" : "Vertical (Wall)")
+                        Text(mapFlatOn ? "Currently: Flat" : "Currently: Vertical")
                             .font(.body)
                             .foregroundStyle(.secondary)
                     }

@@ -23,6 +23,11 @@ struct ImmersiveMapView: View {
     /// Gesture control view model - handles all drag, scale, and rotation gestures
     @State private var gestureVM = GestureControlViewModel()
 
+    // MARK: - Map Mode State
+
+    /// Tracks if map is in flat mode (true) or vertical mode (false)
+    @State private var mapIsFlat = true
+
     let attachmentID = "attachmentID"
 
     var body: some View {
@@ -35,17 +40,19 @@ struct ImmersiveMapView: View {
             // IMPORTANT: Add to content directly, NOT as child of entity
             // Child entities inherit parent's gestures which blocks button taps
             if let sceneAttachment = attachments.entity(for: attachmentID) {
-                // Position in world space - in front and below the map
-                // User requested it to be below the map ("altinda acilsin")
-                sceneAttachment.position = SIMD3<Float>(0, 0.3, -2.0)
-                
+                // Store reference in ViewModel for dynamic position updates
+                viewModel.controlPanelEntity = sceneAttachment
+
+                // Initial position: below the flat map
+                sceneAttachment.position = SIMD3<Float>(0, 0.3, -1.2)
+
                 // Billboard: Always face the user
                 sceneAttachment.components.set(BillboardComponent())
-                
-                // Make it interactive in immersive space
-                sceneAttachment.components.set(InputTargetComponent())
-                sceneAttachment.components.set(CollisionComponent(shapes: [.generateBox(size: [0.5, 0.3, 0.1])]))
-                
+
+                // Add InputTargetComponent for interactivity in immersive space
+                sceneAttachment.components.set(InputTargetComponent(allowedInputTypes: .indirect))
+                sceneAttachment.components.set(CollisionComponent(shapes: [.generateBox(size: [0.6, 0.4, 0.1])]))
+
                 // Add directly to content (not entity child)
                 content.add(sceneAttachment)
             }
@@ -67,9 +74,15 @@ struct ImmersiveMapView: View {
         } attachments: {
             Attachment(id: attachmentID) {
                 MapDetails(turnOnMapFlat: {
+                    mapIsFlat = true
                     viewModel.rotateMap(flat: true)
+                    // Move control panel below the flat map
+                    viewModel.moveControlPanel(toTop: false)
                 }, turnOffMapFlat: {
+                    mapIsFlat = false
                     viewModel.rotateMap(flat: false)
+                    // Move control panel above the vertical map
+                    viewModel.moveControlPanel(toTop: true)
                 })
             }
         }
