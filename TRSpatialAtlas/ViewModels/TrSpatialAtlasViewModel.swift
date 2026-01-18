@@ -1,3 +1,10 @@
+//
+//  TrSpatialAtlasViewModel.swift
+//  TR Spatial Atlas
+//
+//  Created by durul dalkanat on 10/5/25.
+//
+
 import Observation
 import OSLog
 import RealityKit
@@ -24,6 +31,14 @@ class TrSpatialAtlasViewModel {
     /// Control panel positions for different map modes
     private let controlPanelPositionFlat = SIMD3<Float>(0, 0.5, -1.2) // Below flat map
     private let controlPanelPositionVertical = SIMD3<Float>(0, 2.0, -1.2) // Above vertical map
+
+    // MARK: - Map placement baselines (prevents repeated vertical taps from drifting the map)
+
+    /// Cached baseline Y for the map when in flat mode (captured once after the map is positioned).
+    private var flatBaseY: Float?
+
+    /// How much to move the map down when switching to upright mode.
+    private let uprightYOffset: Float = -1.5
     
     // MARK: Color palette for 81 provinces
 
@@ -73,26 +88,34 @@ class TrSpatialAtlasViewModel {
     /// Rotates the map between flat (tabletop) and upright (wall) modes
     func rotateMap(flat: Bool) {
         Logger.ui.debug("rotateMap called with flat: \(flat)")
+
+        // Cache a stable baseline Y once (so repeated taps don't keep moving the map down)
+        if flatBaseY == nil {
+            flatBaseY = contentEntity.transform.translation.y
+            Logger.ui.debug("Cached flatBaseY: \(self.flatBaseY ?? 0)")
+        }
         
+        let baseY = flatBaseY ?? contentEntity.transform.translation.y
+
         // Create target transform based the transformation on the current transformation, only changing the necessary areas.
         var targetTransform = contentEntity.transform
-        
+
         // MARK: (tabletop) & Wall Mode
 
         if flat {
             // Flat: +90 degrees around X (parallel to ground, facing user)
             targetTransform.rotation = simd_quatf(angle: .pi / 2, axis: SIMD3<Float>(1, 0, 0))
-            // Reset Y position for flat mode
-            targetTransform.translation.y = contentEntity.transform.translation.y
+            // Restore the cached flat baseline Y (so we undo any upright offset)
+            targetTransform.translation.y = baseY
             Logger.ui.info("Map rotating to FLAT mode")
         } else {
             // Upright: Vertical wall mode (no X rotation)
             targetTransform.rotation = simd_quatf(angle: 0, axis: SIMD3<Float>(1, 0, 0))
-            // Move map down in vertical mode so it's below the control panel
-            targetTransform.translation.y = contentEntity.transform.translation.y - 1.5
+            // Move map down relative to the cached flat baseline (prevents cumulative drift)
+            targetTransform.translation.y = baseY + uprightYOffset
             Logger.ui.info("Map rotating to UPRIGHT mode (moved down)")
         }
-        
+
         // Use move(to:) with animation for smooth transition and reliable update
         contentEntity.move(
             to: targetTransform,
