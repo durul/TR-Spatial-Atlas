@@ -272,6 +272,7 @@ func rotateMap(flat: Bool) {
 - **Dynamic Control Panel**: Panel repositions to stay accessible in both modes
 - **Double-Sided Rendering**: `faceCulling = .none` ensures polygons are visible from both sides during rotation
 - **Billboard Effect**: Control panel uses `BillboardComponent()` to always face the user regardless of their position
+- **Consistent Y Position**: Cached baseline Y position prevents cumulative drift during repeated mode switches
 
 ```swift
 // ImmersiveMapView.swift - Control panel always faces user
@@ -366,8 +367,6 @@ let entity = ModelEntity(mesh: mesh, materials: [material])
 
 **Special Note:** The **Winding Order** and **Z-Fighting** issues encountered in this project are common problems in 3D graphics programming. These solutions can be applied to similar projects! 🎯
 
-
-
 ---
 
 ## 📄 License
@@ -380,6 +379,6 @@ This project is licensed under the BSD-3-Clause License - see the [LICENSE.txt](
 
 **Made with ❤️ for Apple Vision Pro**
 
-_Created by Durul Dalkanat © 2025_
+_Created by Durul Dalkanat © 2026_
 
 </div>
