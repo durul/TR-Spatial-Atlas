@@ -7,6 +7,7 @@
 
 import ARKit
 import Combine
+import OSLog
 import RealityKit
 import SwiftUI
 
@@ -16,16 +17,16 @@ class ARKitSessionManager: ObservableObject {
     let worldTrackingProvider = WorldTrackingProvider()
 
     func startSession() async {
-        print("WorldTrackingProvider.isSupported: \(WorldTrackingProvider.isSupported)")
-        print("PlaneDetectionProvider.isSupported: \(PlaneDetectionProvider.isSupported)")
-        print("SceneReconstructionProvider.isSupported: \(SceneReconstructionProvider.isSupported)")
-        print("HandTrackingProvider.isSupported: \(HandTrackingProvider.isSupported)")
+        Logger.session.info("WorldTrackingProvider.isSupported: \(WorldTrackingProvider.isSupported)")
+        Logger.session.info("PlaneDetectionProvider.isSupported: \(PlaneDetectionProvider.isSupported)")
+        Logger.session.info("SceneReconstructionProvider.isSupported: \(SceneReconstructionProvider.isSupported)")
+        Logger.session.info("HandTrackingProvider.isSupported: \(HandTrackingProvider.isSupported)")
 
         // Request authorization first
         let authorizationResult = await session.requestAuthorization(for: [.worldSensing])
 
         for (authorizationType, authorizationStatus) in authorizationResult {
-            print("Authorization status for \(authorizationType): \(authorizationStatus)")
+            Logger.session.info("Authorization status for \(authorizationType): \(authorizationStatus)")
         }
         
         // Start monitoring in background tasks
@@ -36,7 +37,7 @@ class ARKitSessionManager: ObservableObject {
             do {
                 try await session.run([worldTrackingProvider])
             } catch {
-                print("Failed to run session: \(error)")
+                Logger.session.error("Failed to run session: \(error)")
             }
         }
     }
@@ -46,16 +47,16 @@ class ARKitSessionManager: ObservableObject {
     }
 
     func handleWorldTrackingUpdates() async {
-        print("\(#function): called")
+        Logger.session.debug("\(#function): called")
         for await update in worldTrackingProvider.anchorUpdates {
-            print("\(#function): anchorUpdates: \(update)")
+            Logger.session.debug("\(#function): anchorUpdates: \(update)")
         }
     }
 
     func monitorSessionEvent() async {
-        print("\(#function): called")
+        Logger.session.debug("\(#function): called")
         for await event in session.events {
-            print("\(#function): \(event)")
+            Logger.session.debug("\(#function): \(event)")
         }
     }
     
@@ -71,7 +72,7 @@ class ARKitSessionManager: ObservableObject {
         // deviceAnchor provides the position and orientation (pose) of the Vision Pro in 3D space.
         // It is used to understand where the user is looking.
         guard let deviceAnchor = worldTrackingProvider.queryDeviceAnchor(atTimestamp: CACurrentMediaTime()) else {
-            print("Could not get device anchor, using default position")
+            Logger.session.warning("Could not get device anchor, using default position")
             entity.position = defaultPosition
             return
         }
@@ -94,7 +95,7 @@ class ARKitSessionManager: ObservableObject {
         let isValidHeadPosition = headPosition.y > 0.5 && headPosition.y < 3.0
         
         if !isValidHeadPosition {
-            print("Invalid head position detected (\(headPosition)), using default position")
+            Logger.session.warning("Invalid head position detected (\(headPosition)), using default position")
             entity.position = defaultPosition
             return
         }
@@ -121,6 +122,6 @@ class ARKitSessionManager: ObservableObject {
         
         entity.position = SIMD3<Float>(mapPosition.x, headPosition.y - 0.3, mapPosition.z)
         
-        print("📍 Map positioned in front of user at: \(mapPosition)")
+        Logger.contentGeneration.info("📍 Map positioned in front of user at: \(mapPosition)")
     }
 }

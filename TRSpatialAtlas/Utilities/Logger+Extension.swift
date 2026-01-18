@@ -15,4 +15,7 @@ extension Logger {
 
     /// General UI logs
     static let ui = Logger(subsystem: subsystem, category: "UI")
+
+    /// Logs related to AR Session and Tracking
+    static let session = Logger(subsystem: subsystem, category: "Session")
 }
