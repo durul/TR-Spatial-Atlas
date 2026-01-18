@@ -43,14 +43,19 @@ class TrSpatialAtlasViewModel {
         return colors
     }()
 
-    // MARK: - Setup Entity
+    // MARK: - Setup Map Entity
 
     func setupContentEntity() -> Entity {
         // Lay the map flat (rotate 90° around X axis - parallel to ground, facing user)
         let xRotation = simd_quatf(angle: .pi / 2, axis: SIMD3<Float>(1, 0, 0))
         contentEntity.transform.rotation = xRotation
         
-        // SCALE UP the map - for better visibility
+        // MARK: SCALE UP the map - for better visibility
+
+        /*
+         * x: 1.5 and z: 1.5 → enlarges horizontally.
+         * y: 0.5 → reduces the height/thickness.
+         */
         contentEntity.scale = [1.5, 0.5, 1.5]
 
         // Add InputTarget + Collision for gesture interaction
@@ -63,15 +68,17 @@ class TrSpatialAtlasViewModel {
         return contentEntity
     }
 
-    // MARK: - Interaction Logic
+    // MARK: - Map Interaction Rotation Logic
     
     /// Rotates the map between flat (tabletop) and upright (wall) modes
     func rotateMap(flat: Bool) {
         Logger.ui.debug("rotateMap called with flat: \(flat)")
         
-        // Create target transform based on mode
+        // Create target transform based the transformation on the current transformation, only changing the necessary areas.
         var targetTransform = contentEntity.transform
         
+        // MARK: (tabletop) & Wall Mode
+
         if flat {
             // Flat: +90 degrees around X (parallel to ground, facing user)
             targetTransform.rotation = simd_quatf(angle: .pi / 2, axis: SIMD3<Float>(1, 0, 0))
@@ -95,6 +102,8 @@ class TrSpatialAtlasViewModel {
         )
     }
     
+    // MARK: - Moves the control panel
+
     /// Moves the control panel to top (for vertical map) or bottom (for flat map) with animation
     func moveControlPanel(toTop: Bool) {
         guard let panel = controlPanelEntity else {

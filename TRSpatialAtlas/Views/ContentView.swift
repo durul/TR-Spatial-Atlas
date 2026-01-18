@@ -9,7 +9,6 @@ import RealityKit
 import SwiftUI
 
 struct ContentView: View {
-    @Environment(AppModel.self) private var appModel
     @Environment(TrSpatialAtlasViewModel.self) private var viewModel
 
     var body: some View {

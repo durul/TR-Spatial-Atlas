@@ -65,6 +65,21 @@ struct MapDetails: View {
     }
 }
 
-#Preview {
-    MapDetails(turnOnMapFlat: {}, turnOffMapFlat: {})
+#Preview("MapDetails Panel - Stateful") {
+    @Previewable @State var mapIsFlat = true
+    let vm = TrSpatialAtlasViewModel()
+
+    return MapDetails(
+        turnOnMapFlat: {
+            mapIsFlat = true
+            vm.rotateMap(flat: true)
+            vm.moveControlPanel(toTop: false)
+        },
+        turnOffMapFlat: {
+            mapIsFlat = false
+            vm.rotateMap(flat: false)
+            vm.moveControlPanel(toTop: true)
+        }
+    )
+    .padding()
 }
