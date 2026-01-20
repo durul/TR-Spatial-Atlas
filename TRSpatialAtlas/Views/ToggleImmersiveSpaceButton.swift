@@ -8,15 +8,20 @@
 import SwiftUI
 
 struct ToggleImmersiveSpaceButton: View {
-
     @Environment(AppModel.self) private var appModel
 
     @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
     @Environment(\.openImmersiveSpace) private var openImmersiveSpace
 
+    var onTriggerRipple: (() -> Void)?
+
     var body: some View {
         Button {
+            onTriggerRipple?()
+
+            // Delay the heavy operation to let ripple animation start smoothly
             Task { @MainActor in
+
                 switch appModel.immersiveSpaceState {
                 case .open:
                     appModel.immersiveSpaceState = .inTransition
@@ -32,10 +37,8 @@ struct ToggleImmersiveSpaceButton: View {
                     case .opened:
                         // Set state here so the button reliably flips to "Hide".
                         appModel.immersiveSpaceState = .open
-
                     case .userCancelled, .error:
                         appModel.immersiveSpaceState = .closed
-
                     @unknown default:
                         appModel.immersiveSpaceState = .closed
                     }
@@ -49,7 +52,6 @@ struct ToggleImmersiveSpaceButton: View {
             Text(appModel.immersiveSpaceState == .open ? "Hide Turkey Map" : "Show Turkey Map")
         }
         .disabled(appModel.immersiveSpaceState == .inTransition)
-        .animation(.none, value: 0)
         .fontWeight(.semibold)
     }
 }
