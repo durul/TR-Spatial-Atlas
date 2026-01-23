@@ -12,7 +12,7 @@ import RealityKitContent
 import SwiftUI
 
 struct ImmersiveMapView: View {
-    @Environment(TrSpatialAtlasViewModel.self) var viewModel
+    @Environment(TrSpatialAtlasViewModel.self) var atlasViewModel
 
     // MARK: - ARKit Session
 
@@ -33,15 +33,16 @@ struct ImmersiveMapView: View {
     var body: some View {
         RealityView { content, attachments in
             // 3D scene setup, position, rotation
-            let entity = viewModel.setupContentEntity()
+            let entity = atlasViewModel.setupContentEntity()
             content.add(entity)
 
-            // Add the control panel attachment
+            // MARK: Add the control panel attachment
+
             // IMPORTANT: Add to content directly, NOT as child of entity
             // Child entities inherit parent's gestures which blocks button taps
             if let sceneAttachment = attachments.entity(for: attachmentID) {
                 // Store reference in ViewModel for dynamic position updates
-                viewModel.controlPanelEntity = sceneAttachment
+                atlasViewModel.controlPanelEntity = sceneAttachment
 
                 // Initial position: below the flat map
                 sceneAttachment.position = SIMD3<Float>(0, 0.3, -1.2)
@@ -58,7 +59,7 @@ struct ImmersiveMapView: View {
             }
 
             // Initiating GeoJSON loading.
-            viewModel.makePolygon()
+            atlasViewModel.makePolygon()
 
             // Position the map in front of the user when the view appears
             Task {
@@ -75,14 +76,14 @@ struct ImmersiveMapView: View {
             Attachment(id: attachmentID) {
                 MapDetails(turnOnMapFlat: {
                     mapIsFlat = true
-                    viewModel.rotateMap(flat: true)
+                    atlasViewModel.rotateMap(flat: true)
                     // Move control panel below the flat map
-                    viewModel.moveControlPanel(toTop: false)
+                    atlasViewModel.moveControlPanel(toTop: false)
                 }, turnOffMapFlat: {
                     mapIsFlat = false
-                    viewModel.rotateMap(flat: false)
+                    atlasViewModel.rotateMap(flat: false)
                     // Move control panel above the vertical map
-                    viewModel.moveControlPanel(toTop: true)
+                    atlasViewModel.moveControlPanel(toTop: true)
                 })
             }
         }

@@ -198,8 +198,8 @@ class TrSpatialAtlasViewModel {
         
         var processedCount = 0
         var skippedCount = 0
-        //
-        // // DEBUG: Show only KONYA
+        
+        // DEBUG: Show only KONYA
         // let testFeatures = features.filter { $0.properties?.name == "Konya" }
         // print("🔍 DEBUG: Testing with \(testFeatures.count) feature(s)")
 
