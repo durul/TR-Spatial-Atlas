@@ -12,47 +12,80 @@ struct ContentView: View {
     @Environment(TrSpatialAtlasViewModel.self) private var viewModel
 
     @State private var counter = 0
-    @State private var touch: CGPoint = .zero
 
     var body: some View {
-        VStack {
-            GeometryReader { proxy in
-                Text("🇹🇷 Türkiye Map")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .modifier(RippleEffect(origin: CGPoint(x: proxy.size.width / 2, y: proxy.size.height / 2), trigger: counter))
-            }
-            .frame(height: 60)
-            .padding()
+        VStack(spacing: 20) {
+            header
 
             Text("3D visualization of Türkiye's provincial borders")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .padding(.bottom)
+                .font(.title3) // subheadline yerine biraz daha rahat
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.horizontal, 12)
 
-            if viewModel.isLoading {
-                VStack {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle())
-                        .scaleEffect(1.5)
-
-                    Text(viewModel.loadingProgress)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .padding(.top, 8)
+            Group {
+                if viewModel.isLoading {
+                    loadingBlock
+                } else {
+                    actions
                 }
-                .padding()
-            } else {
-                ToggleImmersiveSpaceButton(onTriggerRipple: {
-                    Task {
-                        try? await Task.sleep(for: .milliseconds(300))
-
-                        counter += 1
-                    }
-                })
             }
+            .frame(maxWidth: 520)
         }
-        .padding()
+        .padding(24)
+    }
+
+    // MARK: - Sections
+
+    private var header: some View {
+        GeometryReader { proxy in
+            Text("🇹🇷 Türkiye Map")
+                .font(.largeTitle.weight(.bold))
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                .modifier(
+                    RippleEffect(
+                        origin: CGPoint(x: proxy.size.width / 2, y: proxy.size.height / 2),
+                        trigger: counter
+                    )
+                )
+        }
+        .frame(height: 120)
+        .padding(.horizontal, 12)
+        .accessibilityAddTraits(.isHeader)
+    }
+
+    private var loadingBlock: some View {
+        VStack(spacing: 12) {
+            ProgressView()
+                .progressViewStyle(.circular)
+                .controlSize(.large)
+
+            Text(viewModel.loadingProgress)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+        }
+        .padding(20)
+        .frame(maxWidth: .infinity)
+        .glassBackgroundEffect()
+    }
+
+    private var actions: some View {
+        VStack(spacing: 14) {
+            ToggleImmersiveSpaceButton(onTriggerRipple: triggerRipple)
+                .frame(minHeight: 60)
+                .contentShape(Rectangle())
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    // MARK: - Actions
+
+    private func triggerRipple() {
+        Task {
+            try? await Task.sleep(for: .milliseconds(300))
+            counter += 1
+        }
     }
 }
