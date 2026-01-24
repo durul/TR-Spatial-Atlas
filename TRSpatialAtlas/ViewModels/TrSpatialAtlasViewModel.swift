@@ -30,7 +30,7 @@ class TrSpatialAtlasViewModel {
     
     /// Control panel positions for different map modes
     private let controlPanelPositionFlat = SIMD3<Float>(0, 0.5, -1.2) // Below flat map
-    private let controlPanelPositionVertical = SIMD3<Float>(0, 2.0, -1.2) // Above vertical map
+    private let controlPanelPositionVertical = SIMD3<Float>(0, 1.5, -1.2) // Above vertical map
 
     // MARK: - Map placement baselines (prevents repeated vertical taps from drifting the map)
 
