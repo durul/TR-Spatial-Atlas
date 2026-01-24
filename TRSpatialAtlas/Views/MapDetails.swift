@@ -57,6 +57,9 @@ struct MapDetails: View {
             .buttonStyle(.bordered)
             .buttonBorderShape(.roundedRectangle(radius: 16))
             .hoverEffect(.highlight) // VisionOS: Visual feedback on gaze
+            .hoverEffect { effect, isActive, _ in
+                effect.scaleEffect(isActive ? 1.05 : 1.0)
+            }
             .contentShape(Rectangle()) // Ensure entire area is tappable
         }
         .padding(50)
