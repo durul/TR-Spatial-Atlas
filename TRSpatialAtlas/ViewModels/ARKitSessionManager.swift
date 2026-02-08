@@ -81,15 +81,9 @@ class ARKitSessionManager: ObservableObject {
 
         let headTransform = deviceAnchor.originFromAnchorTransform
         
-        // MARK: Extract head position
+        // MARK: Extract head position using SIMD extension
 
-        // I get the translation (x, y, z) from the 4th column of the 4x4 matrix.
-        // columns.3 → The device's position in the world (translation)
-        let headPosition = SIMD3<Float>(
-            headTransform.columns.3.x,
-            headTransform.columns.3.y,
-            headTransform.columns.3.z
-        )
+        let headPosition = headTransform.position
         
         // Validate head position (simulator often returns weird values)
         let isValidHeadPosition = headPosition.y > 0.5 && headPosition.y < 3.0
@@ -100,21 +94,11 @@ class ARKitSessionManager: ObservableObject {
             return
         }
         
-        // MARK: Forward direction
+        // MARK: Forward direction using SIMD extension
         
-        /*
-         • Forward direction (negative Z in the head's local space, horizontal only)
-         • Matrix's columns.2 ( the device's rotation axes ) is generally the "forward/back" axis (z-axis).
-         • I take its negative and use it as the "viewing direction".
-         */
-        let headForward = SIMD3<Float>(
-            -headTransform.columns.2.x,
-            0,
-            -headTransform.columns.2.z
-        )
-        
-        // I'm setting Y to 0 to make the direction horizontal (so the map stays parallel to the ground, even if the head is looking up or down).
-        let normalizedForward = normalize(headForward)
+        // horizontalForward gives us the forward direction with Y zeroed,
+        // so the map stays parallel to the ground even if the head is looking up or down.
+        let normalizedForward = headTransform.horizontalForward
         
         // Place the map 2.5 meters in front of the user's head
         let distance: Float = 2.5
