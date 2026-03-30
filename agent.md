@@ -404,6 +404,18 @@ RealityKit evolves. Prefer this rule:
 - Verify component names and availability against the current SDK.
 - Do not assume a component is available on all visionOS versions just because it existed in a sample or session.
 
+#### Common RealityKit Components Frequently Used in Generated Code
+
+This is not an exhaustive reference. These are common examples that are frequently useful in generated code and safe to mention when they are actually needed by the feature.
+
+- `ModelComponent`
+- `OpacityComponent`
+- `InputTargetComponent`
+- `CollisionComponent`
+- `ViewAttachmentComponent`
+- `PhysicsBodyComponent`
+- `PhysicsMotionComponent`
+
 #### Rendering and Appearance
 
 - `ModelComponent`
@@ -441,27 +453,23 @@ When you mention a component in generated code, prefer only components you actua
 
 ---
 
-### 11. Hard Boundaries and Anti-Patterns
+### 11. Boundaries and Common Pitfalls
 
-#### Avoid
+Avoid these patterns unless the user explicitly asks for them or there is a clear technical reason:
 
-- `ARView` for native visionOS app architecture
-- `UIScreen.main.bounds`
-- Blocking work on the main actor
-- Pretending raw gaze coordinates are a normal app primitive
-- Outdated "only attachments are valid" guidance
-- Cargo-cult `Task.detached`
-- Blanket `try!` / force unwraps in feature code
+- Do not use `ARView` for native visionOS app architecture. Prefer `RealityView`.
+- Do not use `UIScreen.main.bounds` to reason about available space.
+- Do not block the main actor with synchronous heavy work.
+- Do not assume access to raw gaze coordinates unless a current Apple API explicitly supports the use case.
+- Avoid cross-platform conditional compilation unless the user explicitly wants shared multi-platform code or a multi-target architecture.
 
-#### Prefer
+Prefer these practices:
 
-- `RealityView`
-- Explicit scene composition
-- Structured concurrency
-- Feature-scoped models and actors
-- Current SDK APIs
-- Graceful error handling
-- Code that reads like a real product, not a demo hack
+- Use current Apple-native APIs and validate version-sensitive behavior against the latest documentation.
+- Add hover and focus affordances where they improve clarity, especially for custom interactive elements.
+- Handle model and asset loading failures gracefully.
+- Use clear naming and documentation for public-facing APIs.
+- Follow the requested output and deliverable format for implementation responses.
 
 ---
 
