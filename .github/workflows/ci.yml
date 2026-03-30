@@ -11,32 +11,40 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
-    name: Build (visionOS)
-    runs-on: macos-15
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_16.app/Contents/Developer
-
-      - name: Show build environment
-        run: |
-          xcodebuild -version
-          swift --version
-
-      - name: Resolve packages
-        run: xcodebuild -resolvePackageDependencies -project TRSpatialAtlas.xcodeproj -scheme TRSpatialAtlas
-
-      - name: Build for visionOS Simulator
-        run: |
-          xcodebuild build \
-            -project TRSpatialAtlas.xcodeproj \
-            -scheme TRSpatialAtlas \
-            -destination 'platform=visionOS Simulator,name=Apple Vision Pro' \
-            -skipPackagePluginValidation \
-            CODE_SIGNING_ALLOWED=NO \
-            | xcpretty || true
+  # NOTE: Build job requires Xcode 26 beta (Swift 6.3+, visionOS 26 SDK).
+  # GitHub-hosted runners currently ship Xcode 16.x max.
+  # Uncomment this job when macos runners include Xcode 26+,
+  # or use a self-hosted runner with Xcode 26 beta installed.
+  #
+  # build:
+  #   name: Build (visionOS)
+  #   runs-on: macos-15
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #
+  #     - name: Select Xcode
+  #       run: |
+  #         XCODE_PATH=$(ls -d /Applications/Xcode_26* 2>/dev/null | sort -V | tail -1)
+  #         if [ -z "$XCODE_PATH" ]; then
+  #           echo "::error::Xcode 26+ not found on this runner"
+  #           exit 1
+  #         fi
+  #         sudo xcode-select -s "$XCODE_PATH/Contents/Developer"
+  #
+  #     - name: Show build environment
+  #       run: |
+  #         xcodebuild -version
+  #         swift --version
+  #
+  #     - name: Build for visionOS Simulator
+  #       run: |
+  #         xcodebuild build \
+  #           -project TRSpatialAtlas.xcodeproj \
+  #           -scheme TRSpatialAtlas \
+  #           -destination 'platform=visionOS Simulator,name=Apple Vision Pro' \
+  #           -skipPackagePluginValidation \
+  #           CODE_SIGNING_ALLOWED=NO \
+  #           | xcpretty || true
 
   validate:
     name: Repository Health
@@ -49,6 +57,33 @@ jobs:
 
       - name: Verify GeoJSON integrity
         run: python3 -c "import json; json.load(open('TRSpatialAtlas/Turkey.geojson'))"
+
+      - name: Check for hardcoded secrets
+        run: |
+          echo "Scanning for potential secrets..."
+          PATTERNS='(api[_-]?key|secret|password|token|credential)\s*[:=]\s*["\x27][^\s"'\'']{8,}'
+          if grep -rEi "$PATTERNS" --include="*.swift" --include="*.plist" --include="*.json" \
+              --exclude-dir=".git" --exclude="Turkey.geojson" .; then
+            echo "::warning::Potential secrets found — review the matches above"
+          else
+            echo "No hardcoded secrets detected."
+          fi
+
+      - name: Verify required privacy keys in Info.plist
+        run: |
+          PLIST="TRSpatialAtlas/Info.plist"
+          MISSING=0
+          for KEY in NSWorldSensingUsageDescription NSHandsTrackingUsageDescription; do
+            if ! grep -q "$KEY" "$PLIST"; then
+              echo "::error::Missing required key: $KEY in $PLIST"
+              MISSING=1
+            fi
+          done
+          if [ "$MISSING" -eq 0 ]; then
+            echo "All required privacy keys present."
+          else
+            exit 1
+          fi
 
   swiftlint:
     name: SwiftLint
