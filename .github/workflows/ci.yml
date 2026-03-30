@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build (visionOS)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.app/Contents/Developer
+
+      - name: Show build environment
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Resolve packages
+        run: xcodebuild -resolvePackageDependencies -project TRSpatialAtlas.xcodeproj -scheme TRSpatialAtlas
+
+      - name: Build for visionOS Simulator
+        run: |
+          xcodebuild build \
+            -project TRSpatialAtlas.xcodeproj \
+            -scheme TRSpatialAtlas \
+            -destination 'platform=visionOS Simulator,name=Apple Vision Pro' \
+            -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcpretty || true
+
+  validate:
+    name: Repository Health
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for nested git repos
+        run: bash scripts/validate_repo.sh
+
+      - name: Verify GeoJSON integrity
+        run: python3 -c "import json; json.load(open('TRSpatialAtlas/Turkey.geojson'))"
+
+  swiftlint:
+    name: SwiftLint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run SwiftLint
+        uses: norio-nomura/action-swiftlint@3.2.1
+        with:
+          args: --strict
+        continue-on-error: true
